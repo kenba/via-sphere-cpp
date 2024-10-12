@@ -73,6 +73,7 @@ PYBIND11_MODULE(via_sphere, m) {
         "Calculate the distance along the great circle of point b from point a.");
 
   // Python numpy binding for the Arc class
+  // TODO provide numpy binding for the Eigen Vector3 class
 //   PYBIND11_NUMPY_DTYPE(via::Arc<double>, a_, pole_, length_, half_width_);
 
   // Python bindings for the Arc class
@@ -81,7 +82,7 @@ PYBIND11_MODULE(via_sphere, m) {
                     via::Radians<double>, via::Radians<double>>())
       .def(py::init<via::LatLong<double>, via::Angle<double>,
                     via::Radians<double>, via::Radians<double>>())
-      .def(py::init<via::LatLong<double>, via::LatLong<double>>(),
+      .def(py::init<via::LatLong<double>, via::LatLong<double>,
                     via::Radians<double>>())
 
       .def("set_half_width", &via::Arc<double>::set_half_width)
@@ -101,7 +102,8 @@ PYBIND11_MODULE(via_sphere, m) {
       .def("end_arc", &via::Arc<double>::end_arc)
       .def("calculate_atd_and_xtd", &via::Arc<double>::calculate_atd_and_xtd)
 
-      .def("__repr__", &via::Arc<double>::python_repr);
+      .def("__repr__", &via::Arc<double>::python_repr)
+      ;
 
   m.def("calculate_intersection_distances", &via::calculate_intersection_distances<double>,
         "Calculate the great-circle distances along a pair of `Arc`s to their "

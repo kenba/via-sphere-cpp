@@ -84,7 +84,7 @@ public:
   /// A Python representation of an LatLong type.
   /// I.e.: LatLong([lat, lon])
   /// @return a string in Python repr format.
-  std::string python_repr() const {
+  constexpr auto python_repr() const noexcept -> std::string {
     return "LatLong([ " + std::to_string(lat_.v()) + ", " +
             std::to_string(lon_.v()) + " ])";
   }
@@ -338,22 +338,22 @@ public:
 
   /// A Python representation of an Arc.
   /// @return a string in Python repr format.
-  std::string python_repr() const
-  {
+  [[nodiscard("Pure Function")]]
+  constexpr auto python_repr() const noexcept -> std::string {
       static const std::string ARC_START("Arc([[ ");
       static const std::string DELIM(" ");
       static const std::string MID_POINT("],[");
       static const std::string END_POINT("]],");
       static const std::string FINISH(")");
 
-      return ARC_START + std::to_string<T>(a_(0))
-          + DELIM + std::to_string<T>(a_(1))
-          + DELIM + std::to_string<T>(a_(2))
-          + MID_POINT + std::to_string<T>(pole_(0))
-          + DELIM + std::to_string<T>(pole_(1))
-          + DELIM + std::to_string<T>(pole_(2))
-          + END_POINT + std::to_string<T>(length_)
-          + DELIM + std::to_string<T>(half_width_)
+      return ARC_START + std::to_string(a_(0))
+          + DELIM + std::to_string(a_(1))
+          + DELIM + std::to_string(a_(2))
+          + MID_POINT + std::to_string(pole_(0))
+          + DELIM + std::to_string(pole_(1))
+          + DELIM + std::to_string(pole_(2))
+          + END_POINT + std::to_string(length_.v())
+          + DELIM + std::to_string(half_width_.v())
           + FINISH;
   }
 };
