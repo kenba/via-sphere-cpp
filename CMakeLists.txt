@@ -23,8 +23,8 @@ cmake_policy(SET CMP0074 NEW)
 cmake_policy(SET CMP0167 OLD) # For MSVC
 project (via-sphere LANGUAGES CXX)
 
-option(INSTALL_PYTHON "Install Python Library." OFF)
-option(CPP_UNIT_TESTS "Build C++ Unit Tests." ON)
+option(INSTALL_PYTHON "Install Python Library." ON)
+option(CPP_UNIT_TESTS "Build C++ Unit Tests." OFF)
 option(CODE_COVERAGE "Add gcc code coverage options." OFF)
 
 add_library(${PROJECT_NAME} INTERFACE)
@@ -37,6 +37,16 @@ target_compile_definitions(${PROJECT_NAME} INTERFACE _USE_MATH_DEFINES)
 target_include_directories(${PROJECT_NAME} INTERFACE
   $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+
+if (WIN32)
+  # Add the Eigen Library include files
+  set(Eigen_DIR $ENV{Eigen_DIR})
+  include_directories(${Eigen_DIR})
+
+  # Add the Via Angle Library include files
+  set(ViaAngle_DIR $ENV{ViaAngle_DIR})
+  include_directories(${ViaAngle_DIR}/include)
+endif()
 
 if (INSTALL_PYTHON)
   set(PYBIND11_FINDPYTHON ON)
