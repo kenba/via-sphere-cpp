@@ -28,6 +28,7 @@
 #include <pybind11/numpy.h>
 #include "via/sphere.hpp"
 // clang-format on
+#include <pybind11/eigen.h>
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -41,6 +42,100 @@ PYBIND11_MODULE(via_sphere, m) {
     return;
   }
 
+  // Python bindings for sphere constants
+  m.attr("MIN_VALUE") = via::great_circle::MIN_VALUE<double>;
+  m.attr("MIN_SQ_DISTANCE") = via::vector::MIN_SQ_DISTANCE<double>;
+
+  // Python bindings for great_circle functions
+  m.def("e2gc_distance", &via::great_circle::e2gc_distance<double>,
+        "Convert a Euclidean distance to a Great Circle distance (in "
+        "`Radians`).");
+  m.def(
+      "gc2e_distance", &via::great_circle::gc2e_distance<double>,
+      "Convert a Great Circle distance (in `Radians`) to a Euclidean distance");
+  m.def("sq_euclidean_distance",
+        &via::great_circle::sq_euclidean_distance<double>,
+        "Calculate the square of the Euclidean distance (i.e. using "
+        "Pythagoras) between two points from their Latitudes and their "
+        "Longitude difference.");
+  m.def("calculate_gc_distance",
+        &via::great_circle::calculate_gc_distance<double>,
+        "Calculate the Great Circle distance (angle from centre) between two "
+        "points from their Latitudes and their Longitude difference.");
+  m.def(
+      "calculate_gc_azimuth", &via::great_circle::calculate_gc_azimuth<double>,
+      "Calculate the azimuth (bearing) along the great circle of point b from  "
+      "point a from their Latitudes and their Longitude difference.");
+
+  // Python bindings for Vector3 functions
+  m.def("perp_product", &via::vector::perp_product<double>,
+        "2d vector perp product function: a x b.");
+  m.def("dot2d", &via::vector::dot2d<double>,
+        "2d vector dot product function: a . b.");
+  m.def("to_point", &via::vector::to_point<double>,
+        "Convert a latitude and longitude to a point on the unit sphere.");
+  m.def("latitude", &via::vector::latitude<double>,
+        "Calculate the latitude of a point on the unit sphere.");
+  m.def("longitude", &via::vector::longitude<double>,
+        "Calculate the longitude of a point on the unit sphere.");
+  m.def("sq_distance", &via::vector::sq_distance<double>,
+        "Calculate the square of the Euclidean distance between two points.");
+  m.def("distance", &via::vector::distance<double>,
+        "Calculate the shortest (Euclidean) distance between two points.");
+  m.def("are_orthogonal", &via::vector::are_orthogonal<double>,
+        "Determine whether two `Vector3`s are orthogonal (perpendicular).");
+  m.def("delta_longitude", &via::vector::delta_longitude<double>,
+        "Calculate the relative longitude of point a from point b.");
+  m.def("is_west_of", &via::vector::is_west_of<double>,
+        "Determine whether point a is West of point b.");
+  m.def("calculate_pole", &via::vector::calculate_pole<double>,
+        "Calculate the right hand pole vector of a Great Circle from an "
+        "initial position and an azimuth.");
+  m.def(
+      "calculate_azimuth", &via::vector::calculate_azimuth<double>,
+      "Calculate the azimuth at a point on the Great Circle defined by pole.");
+  m.def("calculate_direction", &via::vector::calculate_direction<double>,
+        "Calculate the direction vector along a Great Circle from an initial "
+        "position and an azimuth.");
+  m.def("direction", &via::vector::direction<double>,
+        "Calculate the direction vector of a Great Circle arc.");
+  m.def("position", &via::vector::position<double>,
+        "Calculate the position of a point along a Great Circle arc.");
+  m.def("rotate", &via::vector::rotate<double>,
+        "Calculate the direction vector of a Great Circle rotated by angle.");
+  m.def("rotate_position", &via::vector::rotate_position<double>,
+        "Calculate the position of a point rotated by angle at radius.");
+  m.def("sin_xtd", &via::vector::sin_xtd<double>,
+        "The sine of the across track distance of a point relative to a Great "
+        "Circle pole.");
+  m.def(
+      "cross_track_distance", &via::vector::cross_track_distance<double>,
+      "The across track distance of a point relative to a Great Circle pole.");
+  m.def("sq_cross_track_distance",
+        &via::vector::sq_cross_track_distance<double>,
+        "The square of the Euclidean cross track distance of a point relative "
+        "to a Great Circle pole.");
+  m.def("calculate_point_on_plane",
+        &via::vector::calculate_point_on_plane<double>,
+        "Calculate the closest point on a plane to the given point.");
+  m.def("sin_atd", &via::vector::sin_atd<double>,
+        "The sine of the along track distance of a point along a Great Circle "
+        "arc.");
+  m.def("calculate_great_circle_atd",
+        &via::vector::calculate_great_circle_atd<double>,
+        "Calculate the relative distance of two points on a Great Circle arc.");
+  m.def("along_track_distance", &via::vector::along_track_distance<double>,
+        "The Great Circle distance of a point along the arc relative to a, "
+        "(+ve) ahead of a, (-ve) behind a.");
+  m.def("sq_along_track_distance",
+        &via::vector::sq_along_track_distance<double>,
+        "Calculate the square of the Euclidean along track distance of a point "
+        "from the start of an Arc.");
+  m.def("calculate_atd_and_xtd", &via::vector::calculate_atd_and_xtd<double>,
+        "Calculate the along track and across track distance of a point from "
+        "the start of an Arc.");
+
+  // Python bindings for sphere functions
   m.def("is_valid_latitude", &via::is_valid_latitude<double>,
         "Test whether a latitude in degrees is a valid latitude.");
   m.def("is_valid_longitude", &via::is_valid_longitude<double>,
@@ -65,16 +160,13 @@ PYBIND11_MODULE(via_sphere, m) {
 
   m.def("calculate_azimuth_and_distance",
         &via::calculate_azimuth_and_distance<double>,
-        "Calculate the azimuth and distance along the great circle of point b from "
+        "Calculate the azimuth and distance along the great circle of point b "
+        "from "
         "point a.");
 
-  m.def("haversine_distance",
-        &via::haversine_distance<double>,
-        "Calculate the distance along the great circle of point b from point a.");
-
-  // Python numpy binding for the Arc class
-  // TODO provide numpy binding for the Eigen Vector3 class
-//   PYBIND11_NUMPY_DTYPE(via::Arc<double>, a_, pole_, length_, half_width_);
+  m.def(
+      "haversine_distance", &via::haversine_distance<double>,
+      "Calculate the distance along the great circle of point b from point a.");
 
   // Python bindings for the Arc class
   py::class_<via::Arc<double>>(m, "Arc")
@@ -102,13 +194,14 @@ PYBIND11_MODULE(via_sphere, m) {
       .def("end_arc", &via::Arc<double>::end_arc)
       .def("calculate_atd_and_xtd", &via::Arc<double>::calculate_atd_and_xtd)
 
-      .def("__repr__", &via::Arc<double>::python_repr)
-      ;
+      .def("__repr__", &via::Arc<double>::python_repr);
 
-  m.def("calculate_intersection_distances", &via::calculate_intersection_distances<double>,
+  m.def("calculate_intersection_distances",
+        &via::calculate_intersection_distances<double>,
         "Calculate the great-circle distances along a pair of `Arc`s to their "
         "closest intersection point or their coincident arc distances if the "
         "`Arc`s are on coincident Great Circles.");
-  m.def("calculate_intersection_point", &via::calculate_intersection_point<double>,
+  m.def("calculate_intersection_point",
+        &via::calculate_intersection_point<double>,
         "Calculate whether a pair of `Arc`s intersect and (if so) where.");
 }

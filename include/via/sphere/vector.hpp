@@ -50,6 +50,10 @@ constexpr auto perp_product(const Vector3<T> &a, const Vector3<T> &b) noexcept
   return a(0) * b(1) - a(1) * b(0);
 }
 
+/// 2d vector dot product function: a . b.
+/// @param a, b the two vectors.
+///
+/// @return the 2D dot product of the two vector x and y values.
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
@@ -478,6 +482,14 @@ constexpr auto sq_along_track_distance(const Vector3<T> &a,
   return plane_point.has_value() ? sq_distance(a, plane_point.value()) : T(0);
 }
 
+/// Calculate the along track and across track distance of a point
+/// from the start of an Arc.
+/// It is calculated using the closest point on the plane to the point.
+/// @param a the start point of the Great Circle arc.
+/// @param pole the pole of the Great Circle arc.
+/// @param point the point.
+///
+/// @return the along track and across track distances in Radians.
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
