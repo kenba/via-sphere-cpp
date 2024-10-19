@@ -62,45 +62,45 @@ BOOST_AUTO_TEST_CASE(test_normalise) {
 BOOST_AUTO_TEST_CASE(test_point_lat_longs) {
   // Test South pole
   const LatLong lat_lon_south(Degrees(-90.0), Degrees(180.0));
-  const Vector3<double> point_south{to_point(lat_lon_south)};
+  const Vector3<double> point_south{lat_lon_south.to_point()};
 
   BOOST_CHECK_EQUAL(Degrees(-90.0), latitude(point_south).to_degrees());
   BOOST_CHECK_EQUAL(Degrees(0.0), longitude(point_south).to_degrees());
 
-  auto result{to_lat_long(point_south)};
+  LatLong result{point_south};
   BOOST_CHECK_EQUAL(Degrees(-90.0), result.lat());
   // Note: longitude is now zero, since the poles do not have a Longitude
   BOOST_CHECK_EQUAL(Degrees(0.0), result.lon());
 
   // Test Greenwich equator
   const LatLong lat_lon_0_0(Degrees(0.0), Degrees(0.0));
-  const Vector3<double> point_0{to_point(lat_lon_0_0)};
+  const Vector3<double> point_0{lat_lon_0_0.to_point()};
   BOOST_CHECK(is_unit(point_0));
-  BOOST_CHECK_EQUAL(lat_lon_0_0, to_lat_long(point_0));
+  BOOST_CHECK_EQUAL(lat_lon_0_0, LatLong(point_0));
 
   // Test IDL equator
   const LatLong lat_lon_0_180(Degrees(0.0), Degrees(180.0));
-  const Vector3<double> point_1{to_point(lat_lon_0_180)};
+  const Vector3<double> point_1{lat_lon_0_180.to_point()};
   BOOST_CHECK(is_unit(point_1));
-  BOOST_CHECK_EQUAL(lat_lon_0_180, to_lat_long(point_1));
+  BOOST_CHECK_EQUAL(lat_lon_0_180, LatLong(point_1));
   BOOST_CHECK(!is_west_of(point_0, point_1));
   BOOST_CHECK_EQUAL(Radians(-trig::PI<double>),
                     delta_longitude(point_0, point_1).to_radians());
 
   const LatLong lat_lon_0_m180(Degrees(0.0), Degrees(-180.0));
-  const Vector3<double> point_2{to_point(lat_lon_0_m180)};
+  const Vector3<double> point_2{lat_lon_0_m180.to_point()};
   BOOST_CHECK(is_unit(point_2));
   // Converts back to +ve longitude
-  BOOST_CHECK_EQUAL(lat_lon_0_180, to_lat_long(point_2));
+  BOOST_CHECK_EQUAL(lat_lon_0_180, LatLong(point_2));
   BOOST_CHECK(!is_west_of(point_0, point_2));
   BOOST_CHECK_EQUAL(Radians(-trig::PI<double>),
                     delta_longitude(point_0, point_2).to_radians());
 
   const LatLong lat_lon_0_r3(Degrees(0.0), Degrees(trig::rad2deg(3.0)));
-  const Vector3<double> point_3{to_point(lat_lon_0_r3)};
+  const Vector3<double> point_3{lat_lon_0_r3.to_point()};
   BOOST_CHECK(is_unit(point_3));
 
-  result = to_lat_long(point_3);
+  result = LatLong(point_3);
   BOOST_CHECK_EQUAL(Degrees(0.0), result.lat());
   BOOST_CHECK_EQUAL(Degrees(trig::rad2deg(3.0)), result.lon());
   BOOST_CHECK(is_west_of(point_0, point_3));
@@ -113,12 +113,12 @@ BOOST_AUTO_TEST_CASE(test_point_lat_longs) {
                     CALCULATION_TOLERANCE);
 
   const LatLong lat_lon_0_mr3(Degrees(0.0), Degrees(trig::rad2deg(-3.0)));
-  const Vector3<double> point_4{to_point(lat_lon_0_mr3)};
+  const Vector3<double> point_4{lat_lon_0_mr3.to_point()};
   BOOST_CHECK(is_unit(point_4));
   BOOST_CHECK_EQUAL(Radians(3.0),
                     delta_longitude(point_0, point_4).to_radians());
 
-  result = to_lat_long(point_4);
+  result = LatLong(point_4);
   BOOST_CHECK_EQUAL(Degrees(0.0), result.lat());
   BOOST_CHECK_EQUAL(Degrees(trig::rad2deg(-3.0)), result.lon());
   BOOST_CHECK(is_west_of(point_1, point_4));
@@ -131,10 +131,10 @@ BOOST_AUTO_TEST_CASE(test_point_lat_longs) {
 //////////////////////////////////////////////////////////////////////////////
 BOOST_AUTO_TEST_CASE(test_point_distance) {
   const LatLong lat_lon_south(Degrees(-90.0), Degrees(180.0));
-  const Vector3<double> south_pole{to_point(lat_lon_south)};
+  const Vector3<double> south_pole{lat_lon_south.to_point()};
 
   const LatLong lat_lon_north(Degrees(90.0), Degrees(180.0));
-  const Vector3<double> north_pole{to_point(lat_lon_north)};
+  const Vector3<double> north_pole{lat_lon_north.to_point()};
 
   BOOST_CHECK_EQUAL(0.0, sq_distance(south_pole, south_pole));
   BOOST_CHECK_EQUAL(0.0, sq_distance(north_pole, north_pole));
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(test_calculate_cross_track_distance_and_square) {
 
   for (auto latitude = -89; latitude < 90; ++latitude) {
     const LatLong<double> latlong(Degrees<double>(latitude), longitude);
-    const Vector3<double> point{to_point(latlong)};
+    const Vector3<double> point{latlong.to_point()};
 
     const double expected{trig::deg2rad(static_cast<double>(latitude))};
     const auto xtd{cross_track_distance(pole_0, point)};
@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE(test_calculate_along_track_distance_and_square) {
 
   for (auto longitude = -179; longitude < 180; ++longitude) {
     const LatLong<double> latlong(latitude, Degrees<double>(longitude));
-    const Vector3<double> point{to_point(latlong)};
+    const Vector3<double> point{latlong.to_point()};
 
     const double expected{trig::deg2rad(static_cast<double>(longitude))};
     const auto atd{along_track_distance(g_eq, pole_0, point)};
@@ -347,7 +347,7 @@ BOOST_AUTO_TEST_CASE(test_special_cases) {
   // Test for 100% code coverage
   const double offset{0.000001};
   const LatLong<double> near_north_pole(Degrees(90.0 - offset), Degrees(0.0));
-  const Vector3<double> p{to_point(near_north_pole)};
+  const Vector3<double> p{near_north_pole.to_point()};
   const auto [atd2, xtd2] = calculate_atd_and_xtd(g_eq, pole_0, p);
   BOOST_CHECK_EQUAL(0.0, atd2.v());
   BOOST_CHECK_CLOSE(trig::PI_2<double>, xtd2.v(), 100 * offset);

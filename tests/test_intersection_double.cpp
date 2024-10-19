@@ -38,13 +38,13 @@ BOOST_AUTO_TEST_SUITE(Test_iuntersection_double)
 //////////////////////////////////////////////////////////////////////////////
 BOOST_AUTO_TEST_CASE(test_calculate_intersection_point) {
   const LatLong lat_lon_south(Degrees(-90.0), Degrees(0.0));
-  const Vector3<double> south_pole{to_point(lat_lon_south)};
+  const Vector3<double> south_pole{lat_lon_south.to_point()};
 
   const LatLong lat_lon_north(Degrees(90.0), Degrees(0.0));
-  const Vector3<double> north_pole{to_point(lat_lon_north)};
+  const Vector3<double> north_pole{lat_lon_north.to_point()};
 
   const LatLong lat_lon_idl(Degrees(0.0), Degrees(180.0));
-  const Vector3<double> idl{to_point(lat_lon_idl)};
+  const Vector3<double> idl{lat_lon_idl.to_point()};
 
   const auto equator_intersection{
       calculate_intersection_point(south_pole, north_pole)};
@@ -61,13 +61,13 @@ BOOST_AUTO_TEST_CASE(test_calculate_intersection_point) {
 //////////////////////////////////////////////////////////////////////////////
 BOOST_AUTO_TEST_CASE(test_calculate_intersection_distances) {
   const LatLong start1(Degrees(-1.0), Degrees(-1.0));
-  const Vector3<double> a1{to_point(start1)};
+  const Vector3<double> a1{start1.to_point()};
   const Angle<double> azimuth1(Degrees(45.0));
   const Vector3<double> pole1{
       calculate_pole(Angle(start1.lat()), Angle(start1.lon()), azimuth1)};
 
   const LatLong start2(Degrees(1.0), Degrees(-1.0));
-  const Vector3<double> a2{to_point(start2)};
+  const Vector3<double> a2{start2.to_point()};
   const Angle<double> azimuth2(Degrees(135.0));
   const Vector3<double> pole2{
       calculate_pole(Angle(start2.lat()), Angle(start2.lon()), azimuth2)};

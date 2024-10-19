@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(test_latlong_class) {
 //////////////////////////////////////////////////////////////////////////////
 BOOST_AUTO_TEST_CASE(test_vector3_double) {
   const LatLong<double> a(Degrees(0.0), Degrees(90.0));
-  const auto point{to_point(a)};
+  const auto point{a.to_point()};
 
   BOOST_CHECK_EQUAL(0.0, point(0));
   BOOST_CHECK_EQUAL(1.0, point(1));
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(test_vector3_double) {
   BOOST_CHECK_EQUAL(Degrees(0.0), vector::latitude(point).to_degrees());
   BOOST_CHECK_EQUAL(Degrees(90.0), vector::longitude(point).to_degrees());
 
-  BOOST_CHECK_EQUAL(a, to_lat_long(point));
+  BOOST_CHECK_EQUAL(a, LatLong<double>(point));
 }
 //////////////////////////////////////////////////////////////////////////////
 
@@ -144,12 +144,12 @@ BOOST_AUTO_TEST_CASE(test_arc) {
   BOOST_CHECK(arc.is_valid());
   BOOST_CHECK_EQUAL(Radians(0.01), arc.half_width());
 
-  BOOST_CHECK_EQUAL(to_point<double>(g_eq), arc.a());
+  BOOST_CHECK_EQUAL(g_eq.to_point(), arc.a());
   BOOST_CHECK_EQUAL(Vector3d(0.0, 0.0, 1.0), arc.pole());
   BOOST_CHECK_CLOSE(trig::PI_2<double>, arc.length().v(),
                     CALCULATION_TOLERANCE);
   BOOST_CHECK_EQUAL(Degrees(90.0), arc.azimuth().to_degrees());
-  const auto b{to_point<double>(e_eq)};
+  const auto b{e_eq.to_point()};
   BOOST_CHECK_SMALL(vector::distance(b, arc.b()), CALCULATION_TOLERANCE);
 
   const auto mid_point{arc.mid_point()};
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(test_north_and_south_poles) {
                     CALCULATION_TOLERANCE);
 
   // 90 degrees West on the equator
-  const LatLong<double> w_eq(Degrees(0.0), Degrees(90.0));
+  const LatLong<double> w_eq(Degrees(0.0), Degrees(-90.0));
 
   const Arc<double> arc_w(north_pole, w_eq);
   BOOST_CHECK_SMALL(vector::latitude(arc_w.b()).to_degrees().v(),
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(test_arc_atd_and_xtd) {
   for (auto lat{-83}; lat < 84; ++lat) {
     const Degrees<double> latitude(lat);
     const LatLong<double> latlong(latitude, longitude);
-    const auto point{to_point<double>(latlong)};
+    const auto point{latlong.to_point()};
 
     const double expected{trig::deg2rad(latitude.v())};
     const auto [atd, xtd]{arc.calculate_atd_and_xtd(point)};
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(test_arc_intersection_point) {
   const auto intersection_point_1{calculate_intersection_point(arc1, arc2)};
   BOOST_CHECK(intersection_point_1.has_value());
 
-  const LatLong<double> latlong_1{to_lat_long(intersection_point_1.value())};
+  const LatLong<double> latlong_1{intersection_point_1.value()};
   // Geodesic intersection latitude is 54.7170296089477
   BOOST_CHECK_CLOSE(54.72, latlong_1.lat().v(), 100 * 0.05);
   // Geodesic intersection longitude is -14.56385574430775
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE(test_arc_intersection_point) {
   const auto intersection_point_2{calculate_intersection_point(arc2, arc1)};
   BOOST_CHECK(intersection_point_2.has_value());
 
-  const LatLong<double> latlong_2{to_lat_long(intersection_point_2.value())};
+  const LatLong<double> latlong_2{intersection_point_2.value()};
   // Geodesic intersection latitude is 54.7170296089477
   BOOST_CHECK_CLOSE(54.72, latlong_2.lat().v(), 100 * 0.05);
   // Geodesic intersection longitude is -14.56385574430775

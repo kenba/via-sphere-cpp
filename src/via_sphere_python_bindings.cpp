@@ -147,22 +147,20 @@ PYBIND11_MODULE(via_sphere, m) {
   // Python bindings for the LatLong class
   py::class_<via::LatLong<double>>(m, "LatLong")
       .def(py::init<via::Degrees<double>, via::Degrees<double>>())
+      .def(py::init<via::vector::Vector3<double>>())
 
       .def("is_valid", &via::LatLong<double>::is_valid)
       .def("lat", &via::LatLong<double>::lat)
       .def("lon", &via::LatLong<double>::lon)
+      .def("to_point", &via::LatLong<double>::to_point)
       .def("__repr__", &via::LatLong<double>::python_repr)
 
       .def(py::self == py::self);
 
-  m.def("to_point", &via::to_point<double>,
-        "Convert a `LatLong` to a point on the unit sphere.");
-
   m.def("calculate_azimuth_and_distance",
         &via::calculate_azimuth_and_distance<double>,
         "Calculate the azimuth and distance along the great circle of point b "
-        "from "
-        "point a.");
+        "from point a.");
 
   m.def(
       "haversine_distance", &via::haversine_distance<double>,
@@ -176,6 +174,7 @@ PYBIND11_MODULE(via_sphere, m) {
                     via::Radians<double>, via::Radians<double>>())
       .def(py::init<via::LatLong<double>, via::LatLong<double>,
                     via::Radians<double>>())
+      .def(py::init<via::LatLong<double>, via::LatLong<double>>())
 
       .def("set_half_width", &via::Arc<double>::set_half_width)
       .def("is_valid", &via::Arc<double>::is_valid)

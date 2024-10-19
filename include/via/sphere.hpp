@@ -58,10 +58,24 @@ public:
 public:
 #endif
 
+  /// Contructor from latitude and longitude in Degrees.
+  /// @pre the latitude and longitude must be valid.
+  /// @param lat, lon the latitude and longitude in Degrees.
   constexpr LatLong(const Degrees<T> lat, const Degrees<T> lon)
       : lat_{lat}, lon_{lon} {
 #ifndef PYBIND11_VERSION_MAJOR
     Ensures(is_valid());
+#endif
+  }
+
+  /// Contructor from a unit vector.
+  /// @pre a must be a unit vector.
+  /// @param a the unit vector.
+  explicit constexpr LatLong(const vector::Vector3<T> &a)
+      : LatLong(vector::latitude(a).to_degrees(),
+                vector::longitude(a).to_degrees()) {
+#ifndef PYBIND11_VERSION_MAJOR
+    Ensures(vector::is_unit(a));
 #endif
   }
 
@@ -71,14 +85,22 @@ public:
     return is_valid_latitude(lat_.v()) && is_valid_longitude(lon_.v());
   }
 
+  /// Accessor for the latitude.
   [[nodiscard("Pure Function")]]
   constexpr auto lat() const noexcept -> Degrees<T> {
     return lat_;
   }
 
+  /// Accessor for the longitude.
   [[nodiscard("Pure Function")]]
   constexpr auto lon() const noexcept -> Degrees<T> {
     return lon_;
+  }
+
+  /// Convert a `LatLong` to a point on the unit sphere
+  [[nodiscard("Pure Function")]]
+  constexpr auto to_point() const -> vector::Vector3<T> {
+    return vector::to_point(Angle<T>(lat_), Angle<T>(lon_));
   }
 
   /// A Python representation of an LatLong type.
@@ -86,7 +108,7 @@ public:
   /// @return a string in Python repr format.
   constexpr auto python_repr() const noexcept -> std::string {
     return "LatLong([ " + std::to_string(lat_.v()) + ", " +
-            std::to_string(lon_.v()) + " ])";
+           std::to_string(lon_.v()) + " ])";
   }
 };
 
@@ -105,30 +127,6 @@ template <typename T>
 constexpr auto operator<<(std::ostream &os, const LatLong<T> &a)
     -> std::ostream & {
   return os << '(' << a.lat() << ',' << a.lon() << ')';
-}
-
-/// Convert a `LatLong` to a point on the unit sphere
-/// @param a - the LatLong.
-///
-/// returns a `Vector3` of the point on the unit sphere.
-template <typename T>
-  requires std::floating_point<T>
-[[nodiscard("Pure Function")]]
-constexpr auto to_point(const LatLong<T> &a) -> vector::Vector3<T> {
-  return vector::to_point(Angle<T>(a.lat()), Angle<T>(a.lon()));
-}
-
-/// Convert a point on the unit sphere to a `LatLong`
-/// @param a - the `Vector3` of the point .
-///
-/// returns the LatLong of the point.
-template <typename T>
-  requires std::floating_point<T>
-[[nodiscard("Pure Function")]]
-constexpr auto to_lat_long(const vector::Vector3<T> &a) -> LatLong<T> {
-  const auto lat{vector::latitude(a)};
-  const auto lon{vector::longitude(a)};
-  return LatLong<T>(lat.to_degrees(), lon.to_degrees());
 }
 
 /// Calculate the azimuth and distance along the great circle of point b from
@@ -201,8 +199,8 @@ public:
   constexpr Arc(const LatLong<T> a, const Angle<T> azimuth,
                 const Radians<T> length,
                 const Radians<T> half_width = Radians<T>(0))
-      : a_{to_point<T>(a)}, pole_{vector::calculate_pole<T>(
-                                Angle(a.lat()), Angle(a.lon()), azimuth)},
+      : a_{a.to_point()}, pole_{vector::calculate_pole<T>(
+                              Angle(a.lat()), Angle(a.lon()), azimuth)},
         length_{length}, half_width_{half_width} {}
 
   /// Arc constructor from start and end positions
@@ -288,7 +286,8 @@ public:
 
   /// The position of a perpendicular point at distance from the `Arc`.
   /// @param point a point on the `Arc`'s great circle.
-  /// @param distance the perpendicular distance from the `Arc`'s great circle.
+  /// @param distance the perpendicular distance from the `Arc`'s great
+  /// circle.
   ///
   /// @return the point at perpendicular distance from point.
   [[nodiscard("Pure Function")]]
@@ -308,7 +307,8 @@ public:
     return vector::rotate_position(a_, pole_, angle, Angle<T>(length_));
   }
 
-  /// The `Arc` at the end of an `Arc`, just the point if `half_width` is zero.
+  /// The `Arc` at the end of an `Arc`, just the point if `half_width` is
+  /// zero.
   /// @param `at_b` if true the `Arc` at b, else the `Arc` at a.
   ///
   /// @return the end `Arc` at a or b.
@@ -340,21 +340,17 @@ public:
   /// @return a string in Python repr format.
   [[nodiscard("Pure Function")]]
   constexpr auto python_repr() const noexcept -> std::string {
-      static const std::string ARC_START("Arc([[ ");
-      static const std::string DELIM(" ");
-      static const std::string MID_POINT("],[");
-      static const std::string END_POINT("]],");
-      static const std::string FINISH(")");
+    static const std::string ARC_START("Arc([[ ");
+    static const std::string DELIM(" ");
+    static const std::string MID_POINT("],[");
+    static const std::string END_POINT("]],");
+    static const std::string FINISH(")");
 
-      return ARC_START + std::to_string(a_(0))
-          + DELIM + std::to_string(a_(1))
-          + DELIM + std::to_string(a_(2))
-          + MID_POINT + std::to_string(pole_(0))
-          + DELIM + std::to_string(pole_(1))
-          + DELIM + std::to_string(pole_(2))
-          + END_POINT + std::to_string(length_.v())
-          + DELIM + std::to_string(half_width_.v())
-          + FINISH;
+    return ARC_START + std::to_string(a_(0)) + DELIM + std::to_string(a_(1)) +
+           DELIM + std::to_string(a_(2)) + MID_POINT +
+           std::to_string(pole_(0)) + DELIM + std::to_string(pole_(1)) + DELIM +
+           std::to_string(pole_(2)) + END_POINT + std::to_string(length_.v()) +
+           DELIM + std::to_string(half_width_.v()) + FINISH;
   }
 };
 
@@ -364,8 +360,8 @@ public:
 /// @param arc1, arc2 the `Arc`s.
 ///
 /// @return the distances along the first `Arc` and second `Arc` to the
-/// intersection point or to their coincident arc distances if the `Arc`s do not
-/// intersect.
+/// intersection point or to their coincident arc distances if the `Arc`s do
+/// not intersect.
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
