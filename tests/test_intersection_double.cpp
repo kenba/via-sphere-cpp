@@ -21,7 +21,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "via/sphere.hpp"
 #include <boost/test/unit_test.hpp>
-#include <via/trig.hpp>
 
 using namespace via;
 using namespace via::vector;
