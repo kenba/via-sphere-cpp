@@ -28,6 +28,7 @@ option(CPP_UNIT_TESTS "Build C++ Unit Tests." OFF)
 option(CODE_COVERAGE "Add gcc code coverage options." OFF)
 
 add_library(${PROJECT_NAME} INTERFACE)
+set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER sphere.hpp)
 
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_23)
 
@@ -103,6 +104,11 @@ if (CPP_UNIT_TESTS)
         endif()
     endif()
 
+    enable_testing()
     add_test(NAME via_sphere.test COMMAND  ${PROJECT_NAME}_test)
     endif(Boost_FOUND)
 endif(CPP_UNIT_TESTS)
+
+# Install headers:
+include(GNUInstallDirs)
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/via" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
