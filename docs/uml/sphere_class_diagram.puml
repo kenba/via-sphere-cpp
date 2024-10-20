@@ -1,0 +1,53 @@
+@startuml
+
+'Copyright (c) 2024 Via Technology Ltd. All Rights Reserved.
+
+' title Sphere Class Diagram
+
+set namespaceSeparator ::
+
+    namespace sphere {
+        class Arc {
+            - a
+            - pole
+            - length
+            - half_width
+        }
+
+        namespace vector {
+            class Vector3 {
+                - x
+                - y
+                - z
+            }
+        }
+
+        Arc *- "2" Vector3
+
+        class LatLong {
+            - lat
+            - lon
+        }
+
+        object great_circle {
+            + calculate_haversine_distance
+            + e2gc_distance
+            + gc2e_distance
+            + sq_euclidean_distance
+            + calculate_gc_distance
+            + calculate_gc_azimuth
+        }
+
+        Arc .. great_circle
+        
+        Vector3 .. LatLong
+        Vector3 . great_circle
+
+        great_circle . LatLong
+    }
+
+    great_circle .. angle::Angle
+    great_circle .. angle::Radians
+    LatLong .. angle::Angle
+    LatLong *-- "2" angle::Degrees
+@enduml

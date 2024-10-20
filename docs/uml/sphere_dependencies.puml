@@ -1,0 +1,28 @@
+@startuml
+
+'Copyright (c) 2024 Via Technology Ltd. All Rights Reserved.
+
+' title Sphere dependancies
+
+set namespaceSeparator ::
+    component via_sphere #palegreen
+    package C++ {
+        component eigen
+        component via_angle
+        component gsl
+        package test {
+            component boost_test
+        } 
+    }
+    package python {
+        component pybind11
+    }
+    
+    via_sphere -- via_angle
+    via_sphere -- eigen
+    via_sphere -- boost_test
+    via_sphere -- pybind11
+    via_sphere -- gsl
+    via_angle -- gsl
+
+@enduml
