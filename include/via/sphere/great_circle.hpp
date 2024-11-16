@@ -44,10 +44,11 @@ constexpr T MIN_VALUE{2 * std::numeric_limits<T>::epsilon()};
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
-constexpr auto
-calculate_haversine_distance(const Angle<T> a_lat, const Angle<T> b_lat,
-                             const Angle<T> delta_long,
-                             const Angle<T> delta_lat) noexcept -> Radians<T> {
+constexpr auto calculate_haversine_distance(const Angle<T> a_lat,
+                                            const Angle<T> b_lat,
+                                            const Angle<T> delta_long,
+                                            const Angle<T> delta_lat) noexcept
+    -> Radians<T> {
   const auto haversine_lat{trig::sq_sine_half(delta_lat.cos())};
   const auto haversine_lon{trig::sq_sine_half(delta_long.cos())};
 
@@ -109,9 +110,9 @@ constexpr auto sq_euclidean_distance(const Angle<T> a_lat, const Angle<T> b_lat,
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
-constexpr auto
-calculate_gc_distance(const Angle<T> a_lat, const Angle<T> b_lat,
-                      const Angle<T> delta_long) noexcept -> Radians<T> {
+constexpr auto calculate_gc_distance(const Angle<T> a_lat, const Angle<T> b_lat,
+                                     const Angle<T> delta_long) noexcept
+    -> Radians<T> {
   return e2gc_distance(
       std::sqrt(sq_euclidean_distance(a_lat, b_lat, delta_long)));
 }
@@ -127,9 +128,9 @@ calculate_gc_distance(const Angle<T> a_lat, const Angle<T> b_lat,
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
-constexpr auto
-calculate_gc_azimuth(const Angle<T> a_lat, const Angle<T> b_lat,
-                     const Angle<T> delta_long) noexcept -> Angle<T> {
+constexpr auto calculate_gc_azimuth(const Angle<T> a_lat, const Angle<T> b_lat,
+                                    const Angle<T> delta_long) noexcept
+    -> Angle<T> {
   // if start point is North or South pole
   if (a_lat.cos().v() < MIN_VALUE<T>) {
     // azimuth is zero or 180 degrees
@@ -144,7 +145,7 @@ calculate_gc_azimuth(const Angle<T> a_lat, const Angle<T> b_lat,
                                      a_lat.sin().v() * b_lat.cos().v() - temp
                                : b_lat.sin().v() * a_lat.cos().v() -
                                      a_lat.sin().v() * b_lat.cos().v() + temp};
-    return Angle(sin_azimuth, cos_azimuth);
+    return Angle<T>::from_y_x(sin_azimuth, cos_azimuth);
   }
 }
 } // namespace great_circle

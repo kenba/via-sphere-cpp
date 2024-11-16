@@ -32,9 +32,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER sphere.hpp)
 
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_23)
 
-# define _USE_MATH_DEFINES to define M_PI etc.
-target_compile_definitions(${PROJECT_NAME} INTERFACE _USE_MATH_DEFINES)
-
 target_include_directories(${PROJECT_NAME} INTERFACE
   $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -54,7 +51,6 @@ if (INSTALL_PYTHON)
   find_package(pybind11 CONFIG REQUIRED)
 
   pybind11_add_module(via_sphere src/via_sphere_python_bindings.cpp)
-  target_compile_definitions(via_sphere PRIVATE _USE_MATH_DEFINES)
   target_compile_features(via_sphere PRIVATE cxx_std_23)
   target_include_directories(via_sphere PRIVATE
     $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
@@ -105,7 +101,7 @@ if (CPP_UNIT_TESTS)
     endif()
 
     enable_testing()
-    add_test(NAME via_sphere.test COMMAND  ${PROJECT_NAME}_test)
+    add_test(NAME via-sphere_test COMMAND  ${PROJECT_NAME}_test)
     endif(Boost_FOUND)
 endif(CPP_UNIT_TESTS)
 

@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(test_distance_conversion_functions) {
 //////////////////////////////////////////////////////////////////////////////
 BOOST_AUTO_TEST_CASE(test_distance_and_azimuth_functions) {
   const Angle<double> angle_0;
-  const Angle angle_45(1.0, 1.0);
+  const auto angle_45{Angle<double>::from_y_x(1.0, 1.0)};
 
   auto gc_distance{calculate_gc_distance(angle_0, angle_45, -angle_45)};
   auto haversine_distance{
@@ -71,11 +71,11 @@ BOOST_AUTO_TEST_CASE(test_distance_and_azimuth_functions) {
 //////////////////////////////////////////////////////////////////////////////
 
 BOOST_AUTO_TEST_CASE(test_north_and_south_pole_azimuths) {
-  const Angle angle_90(1.0, 0.0);
+  const auto angle_90{Angle<double>::from_y_x(1.0, 0.0)};
   const Angle angle_m90{-angle_90};
 
   const Angle<double> angle_0;
-  const Angle angle_45(1.0, 1.0);
+  const auto angle_45{Angle<double>::from_y_x(1.0, 1.0)};
   const Angle angle_180{angle_0.opposite()};
 
   // From South Pole

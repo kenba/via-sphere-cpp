@@ -99,7 +99,7 @@ template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
 constexpr auto longitude(const Vector3<T> &a) noexcept -> Angle<T> {
-  return Angle(a(1), a(0));
+  return Angle<T>::from_y_x(a(1), a(0));
 }
 
 /// Determine whether a `Vector3` is a unit vector.
@@ -189,7 +189,7 @@ template <typename T>
 [[nodiscard("Pure Function")]]
 constexpr auto delta_longitude(const Vector3<T> &a,
                                const Vector3<T> &b) noexcept -> Angle<T> {
-  return Angle<T>(perp_product(b, a), dot2d(b, a));
+  return Angle<T>::from_y_x(perp_product(b, a), dot2d(b, a));
 }
 
 /// Determine whether point a is West of point b.
@@ -250,7 +250,7 @@ constexpr auto calculate_azimuth(const Vector3<T> &point,
     return std::signbit(sin_lat) ? Angle<T>() : Angle<T>().opposite();
   }
 
-  return Angle<T>(pole(2), perp_product(pole, point));
+  return Angle<T>::from_y_x(pole(2), perp_product(pole, point));
 }
 
 /// Calculate the direction vector along a Great Circle from an initial
