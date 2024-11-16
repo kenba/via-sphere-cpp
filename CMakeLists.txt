@@ -37,6 +37,10 @@ target_include_directories(${PROJECT_NAME} INTERFACE
   $<INSTALL_INTERFACE:include>)
 
 if (WIN32)
+  # Add the C++ Guidelines Support Library include files
+  set(CPP_GSL_DIR $ENV{CPP_GSL_DIR})
+  include_directories(${CPP_GSL_DIR}/include)
+
   # Add the Eigen Library include files
   set(Eigen_DIR $ENV{Eigen_DIR})
   include_directories(${Eigen_DIR})
@@ -55,10 +59,6 @@ if (INSTALL_PYTHON)
   target_include_directories(via_sphere PRIVATE
     $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
   install(TARGETS via_sphere DESTINATION .)
-else()
-  # Add the C++ Guidelines Support Library include files
-  set(CPP_GSL_DIR $ENV{CPP_GSL_DIR})
-  include_directories(${CPP_GSL_DIR}/include)
 endif(INSTALL_PYTHON)
 
 if (CPP_UNIT_TESTS)

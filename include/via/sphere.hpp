@@ -63,9 +63,7 @@ public:
   /// @param lat, lon the latitude and longitude in Degrees.
   constexpr LatLong(const Degrees<T> lat, const Degrees<T> lon)
       : lat_{lat}, lon_{lon} {
-#ifndef PYBIND11_VERSION_MAJOR
     Ensures(is_valid());
-#endif
   }
 
   /// Contructor from a unit vector.
@@ -74,9 +72,7 @@ public:
   explicit constexpr LatLong(const vector::Vector3<T> &a)
       : LatLong(vector::latitude(a).to_degrees(),
                 vector::longitude(a).to_degrees()) {
-#ifndef PYBIND11_VERSION_MAJOR
-    Ensures(vector::is_unit(a));
-#endif
+    Expects(vector::is_unit(a));
   }
 
   /// Function to determine whether the LatLong is valid.
