@@ -2,7 +2,7 @@
 
 'Copyright (c) 2024 Via Technology Ltd. All Rights Reserved.
 
-' title Sphere dependancies
+' title Sphere dependencies
 
 set namespaceSeparator ::
     component via_sphere #palegreen
@@ -16,13 +16,17 @@ set namespaceSeparator ::
     }
     package python {
         component pybind11
+        component numpy
+        package test {
+            component pytest
+        }
+        pybind11 -- numpy
     }
     
     via_sphere -- via_angle
     via_sphere -- eigen
-    via_sphere -- boost_test
     via_sphere -- pybind11
-    via_sphere -- gsl
+    via_sphere - gsl
     via_angle -- gsl
 
 @enduml
