@@ -1,7 +1,7 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2024 Ken Barker
+// Copyright (c) 2018-2024 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -79,6 +79,14 @@ constexpr auto is_within(const T distance, const T length) noexcept -> bool {
           length + (std::numeric_limits<T>::epsilon() * (T(1) + length)));
 }
 
+/// Calculate the great-circle distances along a pair of `Arc`s on coincident
+/// Great Circles to their closest (reference) points.
+/// @param gc_d the great-circle distance between the arc start points.
+/// @param reciprocal whether the arcs are in reciprocal directions.
+/// @param arc1_length, arc2_length the `Arc` lengths in `Radians`.
+///
+/// @return the distances along the first `Arc` and second `Arc` to their
+/// closest (reference) points in `Radians`.
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]

@@ -1,7 +1,7 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2024 Ken Barker
+// Copyright (c) 2018-2024 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -44,7 +44,8 @@ constexpr auto is_valid_longitude(const T degrees) -> T {
 }
 
 /// The Angle represents an angle by it's sine and cosine components.
-/// @invariant sin() * sin() + cos() * cos() = 1
+/// @invariant latitude lies in the range: -90.0 <= lat_ <= 90.0
+/// and longitude lies in the range: -90.0 <= lon_ <= 90.0
 template <typename T>
   requires std::floating_point<T>
 class LatLong {
@@ -163,15 +164,22 @@ constexpr auto haversine_distance(const LatLong<T> a,
                                                     delta_lat);
 }
 
+/// An `Arc` of a Great Circle on a unit sphere.
+/// @invariant `a_` and `pole_` are orthogonal unit vectors,
+/// length_ and half_width_ are not negative.
 template <typename T>
   requires std::floating_point<T>
 class Arc {
 #ifdef PYBIND11_NUMPY_DTYPE
 public:
 #endif
+  /// The start point of the `Arc`.
   vector::Vector3<T> a_ = {};
+  /// The right hand pole of the Great Circle of the `Arc`.
   vector::Vector3<T> pole_ = {};
+  /// The length of the `Arc`.
   Radians<T> length_ = {Radians<T>(0)};
+  /// The half width of the `Arc`.
   Radians<T> half_width_ = {Radians<T>(0)};
 
 #ifndef PYBIND11_NUMPY_DTYPE
@@ -219,11 +227,14 @@ public:
     half_width_ = half_width;
   }
 
+  /// Test whether an `Arc` is valid.
+  /// @return true if both a and pole are orthogonal unit vectors
+  /// and both length and `half_width` are not negative.
   [[nodiscard("Pure Function")]]
   constexpr auto is_valid() const noexcept -> bool {
     return vector::is_unit(a_) && vector::is_unit(pole_) &&
-           vector::are_orthogonal(a_, pole_) && T(0) <= length_.v() &&
-           T(0) <= half_width_.v();
+           vector::are_orthogonal(a_, pole_) && !std::signbit(length_.v()) &&
+           !std::signbit(half_width_.v());
   }
 
   /// The start point of the `Arc`.
@@ -262,6 +273,7 @@ public:
     return vector::direction(a_, pole_);
   }
 
+  /// A position vector at distance along the `Arc`.
   [[nodiscard("Pure Function")]]
   constexpr auto position(const Radians<T> distance) const noexcept
       -> vector::Vector3<T> {

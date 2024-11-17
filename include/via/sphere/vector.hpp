@@ -1,7 +1,7 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2024 Ken Barker
+// Copyright (c) 2018-2024 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -131,10 +131,10 @@ constexpr auto normalise(const Vector3<T> &a) noexcept
   constexpr T MIN_LENGTH{16384 * std::numeric_limits<T>::epsilon()};
   constexpr T MIN_NORM{MIN_LENGTH * MIN_LENGTH};
 
-  if (a.squaredNorm() >= MIN_NORM)
-    return a.normalized();
+  if (a.squaredNorm() < MIN_NORM)
+    return std::nullopt;
 
-  return std::nullopt;
+  return a.normalized();
 }
 
 /// Calculate the square of the Euclidean distance between two points.
@@ -461,7 +461,7 @@ constexpr auto along_track_distance(const Vector3<T> &a, const Vector3<T> &pole,
   const auto plane_point{normalise(calculate_point_on_plane(pole, point))};
   return plane_point.has_value()
              ? calculate_great_circle_atd(a, pole, plane_point.value())
-             : Radians<T>(0);
+             : Radians<T>(0); // point is too close to a pole
 }
 
 /// Calculate the square of the Euclidean along track distance of a point

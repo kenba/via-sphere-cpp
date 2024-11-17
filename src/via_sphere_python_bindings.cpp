@@ -1,6 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2024 Ken Barker. All Rights Reserved.
-// (ken dot barker at via-technology dot co dot uk)
+// Copyright (c) 2018-2024 Ken Barker.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
