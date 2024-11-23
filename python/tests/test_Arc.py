@@ -144,5 +144,11 @@ def test_arc_intersection_point():
     assert_almost_equal(54.72, latlong_1.lat().v(), 0.05)
     assert_almost_equal(-14.56, latlong_1.lon().v(), 0.02)
 
+    intersection_point_2 = calculate_intersection_point(arc2, arc1)
+    if intersection_point_2:
+        latlong_2 = LatLong(intersection_point_2)
+        assert_almost_equal(54.72, latlong_2.lat().v(), 0.05)
+        assert_almost_equal(-14.56, latlong_2.lon().v(), 0.02)
+
 if __name__ == '__main__':
     pytest.main()
