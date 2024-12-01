@@ -41,6 +41,16 @@ jobs:
           rm eigen-3.4.0.zip
           rm -rf eigen-3.4.0
 
+      - name: install via-angle-cpp library
+        working-directory: ${{github.workspace}}/build
+        run: |
+          git clone https://github.com/kenba/via-angle-cpp.git
+          cd via-angle-cpp
+          cmake -DINSTALL_PYTHON=OFF .
+          sudo make install
+          cd ..
+          rm -rf via-angle-cpp
+
       - name: configure cmake
         working-directory: ${{github.workspace}}/build
         run: cmake -DINSTALL_PYTHON=OFF -DCPP_UNIT_TESTS=ON -DCODE_COVERAGE=ON ${{github.workspace}}
