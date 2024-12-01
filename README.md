@@ -1,4 +1,9 @@
 # via-sphere-cpp
+
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://opensource.org/license/mit/)
+[![C/C++ CI](https://github.com/kenba/via-sphere-cpp/workflows/C/C++%20CI/badge.svg)](https://github.com/kenba/via-sphere-cpp/actions)
+[![codecov](https://codecov.io/gh/kenba/via-sphere-cpp/graph/badge.svg?token=0BTDX7CG6V)](https://codecov.io/gh/kenba/via-sphere-cpp)
+
 A library for performing geometric calculations on the surface of a sphere.
 
 The library uses a combination of spherical trigonometry and vector geometry
