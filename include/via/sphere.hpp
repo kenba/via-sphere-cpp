@@ -48,7 +48,7 @@ constexpr auto is_valid_longitude(const T degrees) -> T {
 /// and longitude lies in the range: -90.0 <= lon_ <= 90.0
 template <typename T>
   requires std::floating_point<T>
-class LatLong {
+class LatLong final {
 #ifdef PYBIND11_NUMPY_DTYPE
 public:
 #endif
@@ -169,7 +169,7 @@ constexpr auto haversine_distance(const LatLong<T> a,
 /// length_ and half_width_ are not negative.
 template <typename T>
   requires std::floating_point<T>
-class Arc {
+class Arc final {
 #ifdef PYBIND11_NUMPY_DTYPE
 public:
 #endif
