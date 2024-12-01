@@ -21,6 +21,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
+/// @file
+/// @brief The via-sphere-cpp library header file.
+//////////////////////////////////////////////////////////////////////////////
+/// @mainpage via-sphere-cpp
+///
+/// The library uses a combination of spherical trigonometry and vector geometry
+/// to perform [great-circle
+/// navigation](https://en.wikipedia.org/wiki/Great-circle_navigation) on the
+/// surface of a unit sphere.
+///
+//////////////////////////////////////////////////////////////////////////////
 #include "via/sphere/intersection.hpp"
 
 namespace via {
