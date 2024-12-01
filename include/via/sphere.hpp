@@ -359,11 +359,11 @@ public:
   /// @return a string in Python repr format.
   [[nodiscard("Pure Function")]]
   constexpr auto python_repr() const noexcept -> std::string {
-    static const std::string ARC_START("Arc([[ ");
-    static const std::string DELIM(" ");
-    static const std::string MID_POINT("],[");
-    static const std::string END_POINT("]],");
-    static const std::string FINISH(")");
+    constexpr auto ARC_START("Arc([[ ");
+    constexpr auto DELIM(" ");
+    constexpr auto MID_POINT("],[");
+    constexpr auto END_POINT("]],");
+    constexpr auto FINISH(")");
 
     return ARC_START + std::to_string(a_(0)) + DELIM + std::to_string(a_(1)) +
            DELIM + std::to_string(a_(2)) + MID_POINT +
