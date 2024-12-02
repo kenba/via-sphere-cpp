@@ -15,6 +15,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: install boost unzip and lcov
         run: |
           sudo apt-get update -qq
@@ -22,6 +23,13 @@ jobs:
 
       - name: create build environment
         run: cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Restore build environment
+        id: build-env-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: /usr/include
+          key: ${{ runner.os }}-environment
 
       - name: install Microsoft GSL library
         working-directory: ${{github.workspace}}/build
@@ -51,6 +59,13 @@ jobs:
           cd ..
           rm -rf via-angle-cpp
 
+      - name: Save build environment
+        id: cache-build-env
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/include
+          key: ${{ steps.build-env-restore.outputs.cache-primary-key }}
+
       - name: configure cmake
         working-directory: ${{github.workspace}}/build
         run: cmake -DINSTALL_PYTHON=OFF -DCPP_UNIT_TESTS=ON -DCODE_COVERAGE=ON ${{github.workspace}}
@@ -71,4 +86,3 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          path: ${{github.workspace}}/build/lcov.info
