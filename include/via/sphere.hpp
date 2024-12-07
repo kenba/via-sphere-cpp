@@ -139,7 +139,7 @@ constexpr auto operator<<(std::ostream &os, const LatLong<T> &a)
 
 /// Calculate the azimuth and distance along the great circle of point b from
 /// point a.
-/// @aparam a, b the start and end positions
+/// @param a, b the start and end positions
 ///
 /// @return the great-circle azimuth relative to North and distance of point b
 /// from point a.
@@ -159,7 +159,7 @@ constexpr auto calculate_azimuth_and_distance(const LatLong<T> a,
 /// Calculate the distance along the great circle of point b from point a,
 /// see: [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula).
 /// This function is less accurate than `calculate_azimuth_and_distance`.
-/// @aparam a, b the start and end positions
+/// @param a, b the start and end positions
 ///
 /// @return the great-circle distance of point b from point a in `Radians`.
 template <typename T>

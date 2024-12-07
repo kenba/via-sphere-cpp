@@ -490,7 +490,7 @@ constexpr auto sq_along_track_distance(const Vector3<T> &a,
 /// It is calculated using the closest point on the plane to the point.
 /// @param a the start point of the Great Circle arc.
 /// @param pole the pole of the Great Circle arc.
-/// @param point the point.
+/// @param p the point.
 ///
 /// @return the along track and across track distances in Radians.
 template <typename T>

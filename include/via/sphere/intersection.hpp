@@ -163,7 +163,7 @@ constexpr auto use_antipodal_point(const Vector3<T> &point,
 /// closest intersection point or their coincident arc distances if the
 /// `Arc`s are on coincident Great Circles.
 /// @param a1, a2 the `Arc` start points.
-/// @param pole1, pole1 the `Arc` poles.
+/// @param pole1, pole2 the `Arc` poles.
 /// @param length1, length2 the `Arc` lengths.
 /// @param centroid the centroid (geometric mean) of the `Arc`s mid points.
 ///
