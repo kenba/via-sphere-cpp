@@ -56,7 +56,7 @@ constexpr auto is_valid_longitude(const T degrees) -> T {
 
 /// The Angle represents an angle by it's sine and cosine components.
 /// @invariant latitude lies in the range: -90.0 <= lat_ <= 90.0
-/// and longitude lies in the range: -90.0 <= lon_ <= 90.0
+/// and longitude lies in the range: -180.0 <= lon_ <= 180.0.
 template <typename T>
   requires std::floating_point<T>
 class LatLong final {
