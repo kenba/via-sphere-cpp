@@ -90,8 +90,7 @@ template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
 constexpr auto latitude(const Vector3<T> &a) noexcept -> Angle<T> {
-  const auto sin_a = trig::UnitNegRange<T>(a(2));
-  return Angle(sin_a, trig::swap_sin_cos(sin_a));
+  return Angle<T>::from_y_x(a(2), std::hypot(a(0), a(1)));
 }
 
 /// Calculate the longitude of a point.
