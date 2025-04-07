@@ -1,7 +1,7 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2024 Ken Barker
+// Copyright (c) 2018-2025 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -54,7 +54,7 @@ constexpr auto is_valid_longitude(const T degrees) -> T {
   return (T(-180) <= degrees) && (degrees <= T(180));
 }
 
-/// The Angle represents an angle by it's sine and cosine components.
+/// LatLong represents a position by its latitude and longitude components.
 /// @invariant latitude lies in the range: -90.0 <= lat_ <= 90.0
 /// and longitude lies in the range: -180.0 <= lon_ <= 180.0.
 template <typename T>
