@@ -1,7 +1,7 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2024 Ken Barker
+// Copyright (c) 2018-2025 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -41,8 +41,8 @@ namespace intersection {
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
-constexpr auto calculate_intersection_point(const Vector3<T> &pole1,
-                                            const Vector3<T> &pole2) noexcept
+constexpr auto calculate_intersection(const Vector3<T> &pole1,
+                                      const Vector3<T> &pole2) noexcept
     -> std::optional<Vector3<T>> {
   return normalise(pole1.cross(pole2));
 }
@@ -181,7 +181,7 @@ constexpr auto calculate_intersection_point_distances(
   if (sq_d < MIN_SQ_DISTANCE<T>)
     return {Radians<T>(0), Radians<T>(0)};
 
-  const auto c{calculate_intersection_point(pole1, pole2)};
+  const auto c{calculate_intersection(pole1, pole2)};
   if (c.has_value()) {
     const auto d{use_antipodal_point(c.value(), centroid) ? -c.value()
                                                           : c.value()};

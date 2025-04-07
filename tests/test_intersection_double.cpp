@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2024 Ken Barker
+// Copyright (c) 2018-2025 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -35,7 +35,7 @@ constexpr auto CALCULATION_TOLERANCE{101 * EPSILON};
 BOOST_AUTO_TEST_SUITE(Test_iuntersection_double)
 
 //////////////////////////////////////////////////////////////////////////////
-BOOST_AUTO_TEST_CASE(test_calculate_intersection_point) {
+BOOST_AUTO_TEST_CASE(test_calculate_intersection) {
   const LatLong lat_lon_south(Degrees(-90.0), Degrees(0.0));
   const Vector3<double> south_pole{lat_lon_south.to_point()};
 
@@ -46,12 +46,12 @@ BOOST_AUTO_TEST_CASE(test_calculate_intersection_point) {
   const Vector3<double> idl{lat_lon_idl.to_point()};
 
   const auto equator_intersection{
-      calculate_intersection_point(south_pole, north_pole)};
+      calculate_intersection(south_pole, north_pole)};
   BOOST_CHECK(!equator_intersection.has_value());
 
-  const auto gc_intersection1{calculate_intersection_point(idl, north_pole)};
+  const auto gc_intersection1{calculate_intersection(idl, north_pole)};
   BOOST_CHECK(gc_intersection1.has_value());
-  const auto gc_intersection2{calculate_intersection_point(idl, south_pole)};
+  const auto gc_intersection2{calculate_intersection(idl, south_pole)};
   BOOST_CHECK(gc_intersection2.has_value());
   BOOST_CHECK_EQUAL(gc_intersection1.value(), -gc_intersection2.value());
 }
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(test_calculate_intersection_distances) {
   const Vector3<double> pole2{
       calculate_pole(Angle(start2.lat()), Angle(start2.lon()), azimuth2)};
 
-  const auto c{calculate_intersection_point(pole1, pole2)};
+  const auto c{calculate_intersection(pole1, pole2)};
   BOOST_CHECK(c.has_value());
   const auto [c1, c2]{
       calculate_intersection_distances(a1, pole1, a2, pole2, c.value())};

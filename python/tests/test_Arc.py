@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2018-2024 Ken Barker
+# Copyright (c) 2018-2025 Ken Barker
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,10 +25,11 @@
 
 import pytest
 import numpy as np
-from numpy.testing import assert_almost_equal, assert_array_equal
+from numpy.testing import assert_almost_equal, assert_array_equal, assert_array_almost_equal
 from via_angle import Angle, Degrees, Radians, deg2rad
 from via_sphere import Arc, LatLong, calculate_azimuth_and_distance, \
-    calculate_intersection_point, distance, latitude, longitude
+    calculate_intersection, calculate_intersection_point, \
+    distance, latitude, longitude
 
 def test_arc():
     # Greenwich equator
@@ -139,7 +140,10 @@ def test_arc_intersection_point():
     arc1 = Arc(istanbul, washington)
     arc2 = Arc(reyjavik, accra)
 
+    intersection = calculate_intersection(arc1.pole(), arc2.pole())
     intersection_point_1 = calculate_intersection_point(arc1, arc2)
+    assert_array_almost_equal(intersection, intersection_point_1, 1e-15)
+
     latlong_1 = LatLong(intersection_point_1)
     assert_almost_equal(54.72, latlong_1.lat().v(), 0.05)
     assert_almost_equal(-14.56, latlong_1.lon().v(), 0.02)

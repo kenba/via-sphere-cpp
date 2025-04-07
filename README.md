@@ -57,14 +57,14 @@ See: [spherical vector geometry](https://via-technology.aero/navigation/spherica
 The software uses types: `Angle`, `Degrees` and `Radians` from the
 [via-angle-cpp](https://github.com/kenba/via-angle-cpp) library.
 
-![Sphere Class Diagram](docs/images/sphere_class_diagram.svg)  
+![Sphere Class Diagram](docs/images/sphere_class_diagram.svg)
 *Figure 3 Class Diagram*
 
 The `Vector3` class is an alias for the [Eigen](https://eigen.tuxfamily.org/) `Vector3` class.
 
 ## Example
 
-The following example calculates the intersection between two Great Circle `Arc`s.  
+The following example calculates the intersection between two Great Circle `Arc`s.
 The values are taken from Charles Karney's original solution to
 [Intersection between two geodesic lines](https://sourceforge.net/p/geographiclib/discussion/1026621/thread/21aaff9f/#fe0a).
 
@@ -128,27 +128,30 @@ The C++ software depends on:
 The C++ tests use the [boost.test](https://www.boost.org/doc/libs/1_86_0/libs/test/doc/html/boost_test/intro.html)
 library, see *Figure 4*.
 
-![Sphere Dependencies](docs/images/sphere_dependencies.svg)  
+![Sphere Dependencies](docs/images/sphere_dependencies.svg)
 *Figure 4 Sphere Dependencies*
 
 ### C++
 
 #### Installation
 
-The library is header only, so the library `include` directory just needs to be added to the include path.  
+The library is header only, so the library `include` directory just needs to be added to the include path.
 Alternatively, when using [cmake](https://cmake.org/) the environment variable `ViaSphere_DIR` just needs
 to be set to the location of the `via-sphere-cpp` directory; `cmake` will add it to the include path.
 
 Note: `CMakeLists.txt` is setup to install python by default, so `-DINSTALL_PYTHON=OFF`
 must be passed to `cmake` when building for C++.
 
-`cmake` can also be used to install the library to the relevant include directory on Linux/macOS.  
+`cmake` can also be used to install the library to the relevant include directory on Linux/macOS.
 In the `via-sphere-cpp` directory, run:
 
 ```bash
 cmake -DINSTALL_PYTHON=OFF .
 sudo make install
 ```
+
+Note: it will be necessary to delete the `CMakeCache.txt` file created by
+running `cmake` above, before running `cmake` on this library again.
 
 #### Tests
 
@@ -179,7 +182,7 @@ pip install ./via-sphere-cpp
 In Python code import the software as `via_sphere`, e.g.:
 
 ```python
-from via_sphere import Angle, Degrees, Radians 
+from via_sphere import Angle, Degrees, Radians
 ```
 
 See: [test_Arc.py](python/tests/test_Arc.py).

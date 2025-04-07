@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2024 Ken Barker.
+// Copyright (c) 2018-2025 Ken Barker.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -133,6 +133,17 @@ PYBIND11_MODULE(via_sphere, m) {
   m.def("calculate_atd_and_xtd", &via::vector::calculate_atd_and_xtd<double>,
         "Calculate the along track and across track distance of a point from "
         "the start of an Arc.");
+
+  // Python bindings for vector intersection functions
+  m.def("calculate_intersection",
+        &via::vector::intersection::calculate_intersection<double>,
+        "Calculate an intersection point between the poles of two Great "
+        "Circles.");
+  m.def("calculate_intersection_distances",
+        &via::vector::intersection::calculate_intersection_distances<double>,
+        "Calculate the great circle distances to an intersection point from "
+        "the start points of a pair of great circle arcs, on different great "
+        "circles.");
 
   // Python bindings for sphere functions
   m.def("is_valid_latitude", &via::is_valid_latitude<double>,
