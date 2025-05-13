@@ -46,12 +46,14 @@ BOOST_AUTO_TEST_CASE(test_calculate_intersection) {
   const Vector3<double> idl{lat_lon_idl.to_point()};
 
   const auto equator_intersection{
-      calculate_intersection(south_pole, north_pole)};
+      calculate_intersection(south_pole, north_pole, MIN_SQ_NORM<double>)};
   BOOST_CHECK(!equator_intersection.has_value());
 
-  const auto gc_intersection1{calculate_intersection(idl, north_pole)};
+  const auto gc_intersection1{
+      calculate_intersection(idl, north_pole, MIN_SQ_NORM<double>)};
   BOOST_CHECK(gc_intersection1.has_value());
-  const auto gc_intersection2{calculate_intersection(idl, south_pole)};
+  const auto gc_intersection2{
+      calculate_intersection(idl, south_pole, MIN_SQ_NORM<double>)};
   BOOST_CHECK(gc_intersection2.has_value());
   BOOST_CHECK_EQUAL(gc_intersection1.value(), -gc_intersection2.value());
 }
@@ -71,7 +73,7 @@ BOOST_AUTO_TEST_CASE(test_calculate_intersection_distances) {
   const Vector3<double> pole2{
       calculate_pole(Angle(start2.lat()), Angle(start2.lon()), azimuth2)};
 
-  const auto c{calculate_intersection(pole1, pole2)};
+  const auto c{calculate_intersection(pole1, pole2, MIN_SQ_NORM<double>)};
   BOOST_CHECK(c.has_value());
   const auto [c1, c2]{
       calculate_intersection_distances(a1, pole1, a2, pole2, c.value())};
@@ -80,7 +82,7 @@ BOOST_AUTO_TEST_CASE(test_calculate_intersection_distances) {
 
   // Calculate the centre of the arc start points
   const Vector3<double> sum{a1 + a2};
-  const auto centre_point{normalise(sum)};
+  const auto centre_point{normalise(sum, MIN_SQ_NORM<double>)};
   BOOST_CHECK(centre_point.has_value());
   BOOST_CHECK(sq_distance(c.value(), centre_point.value()) > 2.0);
 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2024 Ken Barker
+// Copyright (c) 2018-2025 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -36,22 +36,22 @@ BOOST_AUTO_TEST_SUITE(Test_vector_double)
 //////////////////////////////////////////////////////////////////////////////
 BOOST_AUTO_TEST_CASE(test_normalise) {
   const Vector3<double> zero(0.0, 0.0, 0.0);
-  BOOST_CHECK(!normalise(zero));
+  BOOST_CHECK(!normalise(zero, MIN_SQ_NORM<double>));
 
   // Greenwich equator
   const Vector3<double> g_eq(1.0, 0.0, 0.0);
-  BOOST_CHECK(normalise(g_eq));
+  BOOST_CHECK(normalise(g_eq, MIN_SQ_NORM<double>));
 
   // A vector just too small to normalize
   const Vector3<double> too_small(
       16383 * std::numeric_limits<double>::epsilon(), 0.0, 0.0);
-  BOOST_CHECK(!normalise(too_small));
+  BOOST_CHECK(!normalise(too_small, MIN_SQ_NORM<double>));
 
   // A vector just large enough to normalize
   const Vector3<double> small(16384 * std::numeric_limits<double>::epsilon(),
                               0.0, 0.0);
   BOOST_CHECK(!is_unit(small));
-  const auto result{normalise(small)};
+  const auto result{normalise(small, MIN_SQ_NORM<double>)};
   BOOST_CHECK(result.has_value());
   BOOST_CHECK(is_unit(result.value()));
 }

@@ -35,6 +35,7 @@ namespace intersection {
 /// See:
 /// <http://www.movable-type.co.uk/scripts/latlong-vectors.html#intersection>
 /// @param pole1, pole2 the poles.
+/// @param min_sq_value minimum square of a vector length to normalize
 ///
 /// @return an intersection point or None if the poles represent coincident
 /// Great Circles.
@@ -42,9 +43,10 @@ template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
 constexpr auto calculate_intersection(const Vector3<T> &pole1,
-                                      const Vector3<T> &pole2) noexcept
+                                      const Vector3<T> &pole2,
+                                      const T min_sq_value) noexcept
     -> std::optional<Vector3<T>> {
-  return normalise(pole1.cross(pole2));
+  return normalise(pole1.cross(pole2), min_sq_value);
 }
 
 /// Calculate the great circle distances to an intersection point from the
@@ -181,7 +183,7 @@ constexpr auto calculate_intersection_point_distances(
   if (sq_d < MIN_SQ_DISTANCE<T>)
     return {Radians<T>(0), Radians<T>(0)};
 
-  const auto c{calculate_intersection(pole1, pole2)};
+  const auto c{calculate_intersection(pole1, pole2, MIN_SQ_NORM<T>)};
   if (c.has_value()) {
     const auto d{use_antipodal_point(c.value(), centroid) ? -c.value()
                                                           : c.value()};

@@ -1,7 +1,7 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2024 Ken Barker
+// Copyright (c) 2018-2025 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -31,6 +31,17 @@
 
 namespace via {
 namespace vector {
+
+/// The minimum value of the sine of an angle to normalise.
+/// Approximately 7.504e-9 seconds
+template <typename T>
+  requires std::floating_point<T>
+constexpr T MIN_SIN_ANGLE{16384 * std::numeric_limits<double>::epsilon()};
+
+/// The minimum value of the square of distance.
+template <typename T>
+  requires std::floating_point<T>
+constexpr T MIN_SQ_NORM{MIN_SIN_ANGLE<T> * MIN_SIN_ANGLE<T>};
 
 /// The minimum value of the square of distance.
 template <typename T>
@@ -123,17 +134,16 @@ constexpr auto is_unit(const Vector3<T> &a) noexcept -> bool {
 /// Note: this function returns an `Option` so uses the British spelling of
 /// `normalise` to differentiate it from the standard `normalize` function.
 /// @param a the `Vector3`
+/// @param min_sq_value minimum square of a vector length to normalize
 ///
-/// @return the nomalized point or None if the vector is too small to normalize.
+/// @return the nomalized point or None if the vector is too small to
+/// normalize.
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
-constexpr auto normalise(const Vector3<T> &a) noexcept
+constexpr auto normalise(const Vector3<T> &a, const T min_sq_value) noexcept
     -> std::optional<Vector3<T>> {
-  constexpr T MIN_LENGTH{16384 * std::numeric_limits<T>::epsilon()};
-  constexpr T MIN_NORM{MIN_LENGTH * MIN_LENGTH};
-
-  if (a.squaredNorm() < MIN_NORM)
+  if (a.squaredNorm() < min_sq_value)
     return std::nullopt;
 
   return a.normalized();
@@ -341,12 +351,14 @@ constexpr auto rotate_position(const Vector3<T> &a, const Vector3<T> &pole,
   return position(a, rotate(direction(a, pole), pole, angle), radius);
 }
 
-/// The sine of the across track distance of a point relative to a Great Circle
-/// pole. It is simply the dot product of the pole and the point: pole . point
+/// The sine of the across track distance of a point relative to a Great
+/// Circle pole. It is simply the dot product of the pole and the point: pole
+/// . point
 /// @param pole the Great Circle pole.
 /// @param point the point.
 ///
-/// @return the sine of the across track distance of point relative to the pole.
+/// @return the sine of the across track distance of point relative to the
+/// pole.
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
@@ -413,8 +425,8 @@ constexpr auto calculate_point_on_plane(const Vector3<T> &pole,
 /// @param pole the pole of the Great Circle arc.
 /// @param point the point.
 ///
-/// @return the sine of the along track distance of point relative to the start
-/// of a great circle arc.
+/// @return the sine of the along track distance of point relative to the
+/// start of a great circle arc.
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
@@ -460,7 +472,8 @@ template <typename T>
 constexpr auto along_track_distance(const Vector3<T> &a, const Vector3<T> &pole,
                                     const Vector3<T> &point) noexcept
     -> Radians<T> {
-  const auto plane_point{normalise(calculate_point_on_plane(pole, point))};
+  const auto plane_point{
+      normalise(calculate_point_on_plane(pole, point), MIN_SQ_NORM<T>)};
   return plane_point.has_value()
              ? calculate_great_circle_atd(a, pole, plane_point.value())
              : Radians<T>(0); // point is too close to a pole
@@ -480,7 +493,8 @@ template <typename T>
 constexpr auto sq_along_track_distance(const Vector3<T> &a,
                                        const Vector3<T> &pole,
                                        const Vector3<T> &point) noexcept -> T {
-  const auto plane_point{normalise<T>(calculate_point_on_plane(pole, point))};
+  const auto plane_point{
+      normalise<T>(calculate_point_on_plane(pole, point), MIN_SQ_NORM<T>)};
   return plane_point.has_value() ? sq_distance(a, plane_point.value()) : T(0);
 }
 
@@ -508,7 +522,7 @@ constexpr auto calculate_atd_and_xtd(const Vector3<T> &a,
     if (std::abs(sine_xtd) >= std::numeric_limits<T>::epsilon())
       xtd = Radians<T>(std::asin(sine_xtd));
 
-    const auto plane_point{normalise<T>(p - sine_xtd * pole)};
+    const auto plane_point{normalise<T>(p - sine_xtd * pole, MIN_SQ_NORM<T>)};
     atd = plane_point.has_value()
               ? calculate_great_circle_atd(a, pole, plane_point.value())
               : Radians<T>(0);
