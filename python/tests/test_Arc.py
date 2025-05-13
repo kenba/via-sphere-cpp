@@ -29,7 +29,7 @@ from numpy.testing import assert_almost_equal, assert_array_equal, assert_array_
 from via_angle import Angle, Degrees, Radians, deg2rad
 from via_sphere import Arc, LatLong, calculate_azimuth_and_distance, \
     calculate_intersection, calculate_intersection_point, \
-    distance, latitude, longitude
+    distance, latitude, longitude, MIN_SQ_NORM
 
 def test_arc():
     # Greenwich equator
@@ -140,7 +140,7 @@ def test_arc_intersection_point():
     arc1 = Arc(istanbul, washington)
     arc2 = Arc(reyjavik, accra)
 
-    intersection = calculate_intersection(arc1.pole(), arc2.pole())
+    intersection = calculate_intersection(arc1.pole(), arc2.pole(), MIN_SQ_NORM)
     intersection_point_1 = calculate_intersection_point(arc1, arc2)
     assert_array_almost_equal(intersection, intersection_point_1, 1e-15)
 

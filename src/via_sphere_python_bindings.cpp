@@ -43,6 +43,8 @@ PYBIND11_MODULE(via_sphere, m) {
 
   // Python bindings for sphere constants
   m.attr("MIN_VALUE") = via::great_circle::MIN_VALUE<double>;
+  m.attr("MIN_SIN_ANGLE") = via::vector::MIN_SIN_ANGLE<double>;
+  m.attr("MIN_SQ_NORM") = via::vector::MIN_SQ_NORM<double>;
   m.attr("MIN_SQ_DISTANCE") = via::vector::MIN_SQ_DISTANCE<double>;
 
   // Python bindings for great_circle functions
