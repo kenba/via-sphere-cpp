@@ -237,9 +237,7 @@ constexpr auto calculate_pole(const Angle<T> lat, const Angle<T> lon,
   const auto y{trig::UnitNegRange<T>::clamp(
       T(0) - lon.cos().v() * azi.cos().v() - lat.sin().v() * lon.sin().v() * azi.sin().v()
   )};
-  const auto z{trig::UnitNegRange<T>::clamp(
-      lat.cos().v() * azi.sin().v()
-  )};
+  const auto z{trig::UnitNegRange<T>(lat.cos().v() * azi.sin().v())};
   // clang-format on
   return Vector3<T>(x.v(), y.v(), z.v());
 }
@@ -259,7 +257,9 @@ constexpr auto calculate_azimuth(const Vector3<T> &point,
   const auto sin_lat{point(2)};
   // if the point is close to the North or South poles, azimuth is 180 or 0.
   if (MAX_LAT <= std::abs(sin_lat)) {
-    return std::signbit(sin_lat) ? Angle<T>() : Angle<T>().opposite();
+    return std::signbit(sin_lat)
+               ? Angle<T>()
+               : Angle<T>(trig::UnitNegRange<T>(0), trig::UnitNegRange<T>(-1));
   }
 
   return Angle<T>::from_y_x(pole(2), perp_product(pole, point));
@@ -286,9 +286,7 @@ constexpr auto calculate_direction(const Angle<T> lat, const Angle<T> lon,
   const auto y{trig::UnitNegRange<T>::clamp(
       T(0) - lat.sin().v() * lon.sin().v() * azi.cos().v() + lon.cos().v() * azi.sin().v()
   )};
-  const auto z{trig::UnitNegRange<T>::clamp(
-      lat.cos().v() * azi.cos().v()
-  )};
+  const auto z{trig::UnitNegRange<T>(lat.cos().v() * azi.cos().v())};
   // clang-format on
   return Vector3<T>(x.v(), y.v(), z.v());
 }

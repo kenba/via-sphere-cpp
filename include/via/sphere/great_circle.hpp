@@ -137,7 +137,9 @@ constexpr auto calculate_gc_azimuth(const Angle<T> a_lat, const Angle<T> b_lat,
   // if start point is North or South pole
   if (a_lat.cos().v() < MIN_VALUE<T>) {
     // azimuth is zero or 180 degrees
-    return std::signbit(a_lat.sin().v()) ? Angle<T>() : Angle<T>().opposite();
+    return std::signbit(a_lat.sin().v())
+               ? Angle<T>()
+               : Angle<T>(trig::UnitNegRange<T>(0), trig::UnitNegRange<T>(-1));
   } else {
     const auto sin_azimuth{b_lat.cos().v() * delta_long.sin().v()};
     const auto temp{(a_lat.sin().v() * b_lat.cos().v() * delta_long.sin().v() *
