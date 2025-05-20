@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2024 Ken Barker
+// Copyright (c) 2018-2025 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -54,10 +54,19 @@ BOOST_AUTO_TEST_CASE(test_distance_and_azimuth_functions) {
       calculate_haversine_distance(angle_0, angle_45, -angle_45, -angle_45)};
   BOOST_CHECK_CLOSE(gc_distance.v(), haversine_distance.v(),
                     CALCULATION_TOLERANCE);
+  auto sigma{calculate_sigma(angle_0, angle_45, -angle_45)};
+  BOOST_CHECK_CLOSE(gc_distance.v(), sigma.to_radians().v(),
+                    CALCULATION_TOLERANCE);
 
   auto gc_azimuth{calculate_gc_azimuth(angle_0, angle_45, -angle_45)};
   BOOST_CHECK_CLOSE(-35.264389682754654, gc_azimuth.to_degrees().v(),
                     CALCULATION_TOLERANCE);
+
+  auto latitude{calculate_latitude(angle_0, gc_azimuth, sigma)};
+  BOOST_CHECK_EQUAL(angle_45, latitude);
+
+  auto delta_lon{calculate_delta_longitude(angle_0, gc_azimuth, sigma)};
+  BOOST_CHECK_CLOSE(-45.0, delta_lon.to_degrees().v(), CALCULATION_TOLERANCE);
 
   // Same point
   gc_distance = calculate_gc_distance(angle_45, angle_45, angle_0);
@@ -65,11 +74,21 @@ BOOST_AUTO_TEST_CASE(test_distance_and_azimuth_functions) {
   haversine_distance =
       calculate_haversine_distance(angle_45, angle_45, angle_0, angle_0);
   BOOST_CHECK_EQUAL(Radians(0.0), haversine_distance);
+  sigma = calculate_sigma(angle_45, angle_45, angle_0);
+  BOOST_CHECK_EQUAL(Radians(0.0), sigma.to_radians());
+
   gc_azimuth = calculate_gc_azimuth(angle_45, angle_45, angle_0);
   BOOST_CHECK_EQUAL(Degrees(0.0), gc_azimuth.to_degrees());
+
+  latitude = calculate_latitude(angle_45, gc_azimuth, sigma);
+  BOOST_CHECK_CLOSE(45.0, latitude.to_degrees().v(), CALCULATION_TOLERANCE);
+
+  delta_lon = calculate_delta_longitude(angle_45, gc_azimuth, sigma);
+  BOOST_CHECK_EQUAL(Degrees(0.0), delta_lon.to_degrees());
 }
 //////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////
 BOOST_AUTO_TEST_CASE(test_north_and_south_pole_azimuths) {
   const auto angle_90{Angle<double>::from_y_x(1.0, 0.0)};
   const Angle angle_m90{-angle_90};
@@ -84,6 +103,28 @@ BOOST_AUTO_TEST_CASE(test_north_and_south_pole_azimuths) {
 
   gc_azimuth = calculate_gc_azimuth(angle_90, angle_45, angle_0);
   BOOST_CHECK_EQUAL(angle_180, gc_azimuth);
+}
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+BOOST_AUTO_TEST_CASE(test_calculate_other_azimuth) {
+  const auto angle_90{Angle<double>::from_y_x(1.0, 0.0)};
+  const Angle<double> angle_50(Degrees<double>(50.0));
+  const auto angle_45{Angle<double>::from_y_x(1.0, 1.0)};
+  const Angle<double> angle_20(Degrees<double>(20.0));
+
+  auto result = calculate_other_azimuth(angle_20, angle_50, angle_20);
+  BOOST_CHECK_CLOSE(30.0, result.to_degrees().v(), CALCULATION_TOLERANCE);
+
+  result = calculate_other_azimuth(angle_50, angle_20, angle_20);
+  BOOST_CHECK_CLOSE(13.530064432438888, result.to_degrees().v(),
+                    CALCULATION_TOLERANCE);
+
+  result = calculate_other_azimuth(-angle_50, angle_50, angle_20);
+  BOOST_CHECK_EQUAL(20.0, result.to_degrees().v());
+
+  result = calculate_other_azimuth(angle_45, angle_45, angle_90);
+  BOOST_CHECK_EQUAL(90.0, result.to_degrees().v());
 }
 //////////////////////////////////////////////////////////////////////////////
 

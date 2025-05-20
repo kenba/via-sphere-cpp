@@ -1,7 +1,7 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2024 Ken Barker
+// Copyright (c) 2018-2025 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -153,5 +153,111 @@ constexpr auto calculate_gc_azimuth(const Angle<T> a_lat, const Angle<T> b_lat,
     return Angle<T>::from_y_x(sin_azimuth, cos_azimuth);
   }
 }
+
+/// Calculate the Great Circle distance (as an angle, sigma) between two points
+/// from their Latitudes and their Longitude difference.
+/// From Eurocae ED-323 Appendix E.
+/// @param a_lat start point latitude.
+/// @param b_lat finish point latitude.
+/// @param delta_long longitude difference between start and finish points.
+///
+/// @return the Great Circle distance between the points (sigma) as an Angle.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto calculate_sigma(const Angle<T> a_lat, const Angle<T> b_lat,
+                               const Angle<T> delta_long) noexcept -> Angle<T> {
+
+  const T a{b_lat.cos().v() * delta_long.sin().v()};
+  const T b{a_lat.cos().v() * b_lat.sin().v() -
+            a_lat.sin().v() * b_lat.cos().v() * delta_long.cos().v()};
+  const trig::UnitNegRange<T> sin_sigma{std::hypot(a, b)};
+  const trig::UnitNegRange<T> cos_sigma{a_lat.sin().v() * b_lat.sin().v() +
+                                        a_lat.cos().v() * b_lat.cos().v() *
+                                            delta_long.cos().v()};
+  return Angle<T>(sin_sigma, cos_sigma);
+}
+
+/// Calculate the latitude at great circle distance, sigma.
+/// @param a_lat the latitude of the start point.
+/// @param azi the azimuth at a_lat.
+/// @param sigma the distance on the auxiliary sphere as an Angle.
+///
+/// @return the latitude at sigma from a_lat.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto calculate_latitude(const Angle<T> lat, const Angle<T> azi,
+                                  const Angle<T> sigma) noexcept -> Angle<T> {
+  const trig::UnitNegRange<T> sin_lat{lat.sin().v() * sigma.cos().v() +
+                                      lat.cos().v() * sigma.sin().v() *
+                                          azi.cos().v()};
+  const trig::UnitNegRange<T> cos_lat{
+      std::hypot(lat.cos().v() * azi.sin().v(),
+                 lat.sin().v() * sigma.sin().v() -
+                     lat.cos().v() * sigma.cos().v() * azi.cos().v())};
+  const Angle<T> latitude(sin_lat, cos_lat);
+
+  Ensures(latitude.is_valid());
+
+  return latitude;
+}
+
+/// Calculate the longitude difference at great circle distance, sigma.
+/// @param a_lat the latitude of the start point.
+/// @param azi the azimuth at a_lat.
+/// @param sigma the distance on the auxiliary sphere as an Angle.
+///
+/// @return the longitude difference from a_lat.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto calculate_delta_longitude(const Angle<T> lat, const Angle<T> azi,
+                                         const Angle<T> sigma) noexcept
+    -> Angle<T> {
+  const T sin_lon{sigma.sin().v() * azi.sin().v()};
+  const T cos_lon{lat.cos().v() * sigma.cos().v() -
+                  lat.sin().v() * sigma.sin().v() * azi.cos().v()};
+  const auto delta_lon{Angle<T>::from_y_x(sin_lon, cos_lon)};
+
+  Ensures(delta_lon.is_valid());
+
+  return delta_lon;
+}
+
+/// Calculate the azimuth at latitude b_lat from the azimuth at latitude a_lat.
+///
+/// @param a_lat, b_lat parametric latitudes on the auxiliary sphere.
+/// @param a_alpha initial azimuth.
+/// @return azimuth at b_lat.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto calculate_other_azimuth(const Angle<T> a_lat,
+                                       const Angle<T> b_lat,
+                                       const Angle<T> a_alpha) -> Angle<T> {
+  Expects(a_alpha.sin().v() > T());
+
+  const auto sin_alpha2{
+      b_lat.cos() == a_lat.cos()
+          ? a_alpha.sin()
+          : trig::UnitNegRange<T>::clamp(a_alpha.sin().v() * a_lat.cos().v() /
+                                         b_lat.cos().v())};
+
+  // Karney's method to calculate the cosine of the other azimuth
+  trig::UnitNegRange<T> cos_alpha2{a_alpha.cos().abs()};
+  if ((b_lat.cos() != a_lat.cos()) || (b_lat.sin().abs() != -a_lat.sin())) {
+    const T temp1{a_alpha.cos().v() * a_lat.cos().v()};
+    const T temp2{(a_lat.cos() < a_lat.sin().abs())
+                      ? trig::sq_a_minus_sq_b(b_lat.cos(), a_lat.cos()).v()
+                      : trig::sq_a_minus_sq_b(a_lat.sin(), b_lat.sin()).v()};
+    const T temp3{temp1 * temp1 + temp2};
+    const T temp4{(temp3 > T()) ? std::sqrt(temp3) / b_lat.cos().v() : T()};
+    cos_alpha2 = trig::UnitNegRange<T>::clamp(temp4);
+  }
+
+  return Angle<T>{sin_alpha2, cos_alpha2};
+}
+
 } // namespace great_circle
 } // namespace via

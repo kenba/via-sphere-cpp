@@ -67,6 +67,18 @@ PYBIND11_MODULE(via_sphere, m) {
       "calculate_gc_azimuth", &via::great_circle::calculate_gc_azimuth<double>,
       "Calculate the azimuth (bearing) along the great circle of point b from  "
       "point a from their Latitudes and their Longitude difference.");
+  m.def("calculate_sigma", &via::great_circle::calculate_sigma<double>,
+        "Calculate the Great Circle distance (as an angle, sigma) between two "
+        "points from their Latitudes and their Longitude difference.");
+  m.def("calculate_latitude", &via::great_circle::calculate_latitude<double>,
+        "Calculate the latitude at great circle distance, sigma.");
+  m.def("calculate_delta_longitude",
+        &via::great_circle::calculate_delta_longitude<double>,
+        "Calculate the longitude difference at great circle distance, sigma.");
+  m.def("calculate_other_azimuth",
+        &via::great_circle::calculate_other_azimuth<double>,
+        "Calculate the azimuth at latitude b_lat from the azimuth at latitude "
+        "a_lat.");
 
   // Python bindings for Vector3 functions
   m.def("perp_product", &via::vector::perp_product<double>,
