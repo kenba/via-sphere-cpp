@@ -225,39 +225,5 @@ constexpr auto calculate_delta_longitude(const Angle<T> lat, const Angle<T> azi,
   return delta_lon;
 }
 
-/// Calculate the azimuth at latitude b_lat from the azimuth at latitude a_lat.
-///
-/// @param a_lat, b_lat parametric latitudes on the auxiliary sphere.
-/// @param a_alpha initial azimuth.
-/// @return azimuth at b_lat.
-template <typename T>
-  requires std::floating_point<T>
-[[nodiscard("Pure Function")]]
-constexpr auto calculate_other_azimuth(const Angle<T> a_lat,
-                                       const Angle<T> b_lat,
-                                       const Angle<T> a_alpha) -> Angle<T> {
-  Expects(a_alpha.sin().v() > T());
-
-  const auto sin_alpha2{
-      b_lat.cos() == a_lat.cos()
-          ? a_alpha.sin()
-          : trig::UnitNegRange<T>::clamp(a_alpha.sin().v() * a_lat.cos().v() /
-                                         b_lat.cos().v())};
-
-  // Karney's method to calculate the cosine of the other azimuth
-  trig::UnitNegRange<T> cos_alpha2{a_alpha.cos().abs()};
-  if ((b_lat.cos() != a_lat.cos()) || (b_lat.sin().abs() != -a_lat.sin())) {
-    const T temp1{a_alpha.cos().v() * a_lat.cos().v()};
-    const T temp2{(a_lat.cos() < a_lat.sin().abs())
-                      ? trig::sq_a_minus_sq_b(b_lat.cos(), a_lat.cos()).v()
-                      : trig::sq_a_minus_sq_b(a_lat.sin(), b_lat.sin()).v()};
-    const T temp3{temp1 * temp1 + temp2};
-    const T temp4{(temp3 > T()) ? std::sqrt(temp3) / b_lat.cos().v() : T()};
-    cos_alpha2 = trig::UnitNegRange<T>::clamp(temp4);
-  }
-
-  return Angle<T>{sin_alpha2, cos_alpha2};
-}
-
 } // namespace great_circle
 } // namespace via

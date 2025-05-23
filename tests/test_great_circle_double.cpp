@@ -106,27 +106,5 @@ BOOST_AUTO_TEST_CASE(test_north_and_south_pole_azimuths) {
 }
 //////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////
-BOOST_AUTO_TEST_CASE(test_calculate_other_azimuth) {
-  const auto angle_90{Angle<double>::from_y_x(1.0, 0.0)};
-  const Angle<double> angle_50(Degrees<double>(50.0));
-  const auto angle_45{Angle<double>::from_y_x(1.0, 1.0)};
-  const Angle<double> angle_20(Degrees<double>(20.0));
-
-  auto result = calculate_other_azimuth(angle_20, angle_50, angle_20);
-  BOOST_CHECK_CLOSE(30.0, result.to_degrees().v(), CALCULATION_TOLERANCE);
-
-  result = calculate_other_azimuth(angle_50, angle_20, angle_20);
-  BOOST_CHECK_CLOSE(13.530064432438888, result.to_degrees().v(),
-                    CALCULATION_TOLERANCE);
-
-  result = calculate_other_azimuth(-angle_50, angle_50, angle_20);
-  BOOST_CHECK_EQUAL(20.0, result.to_degrees().v());
-
-  result = calculate_other_azimuth(angle_45, angle_45, angle_90);
-  BOOST_CHECK_EQUAL(90.0, result.to_degrees().v());
-}
-//////////////////////////////////////////////////////////////////////////////
-
 BOOST_AUTO_TEST_SUITE_END()
 //////////////////////////////////////////////////////////////////////////////
