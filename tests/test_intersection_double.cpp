@@ -103,6 +103,19 @@ BOOST_AUTO_TEST_CASE(test_calculate_intersection_distances) {
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
+BOOST_AUTO_TEST_CASE(test_is_alongside) {
+  BOOST_CHECK(!is_alongside(Radians(-5.0 * EPSILON), Radians(3.0),
+                            Radians(4.0 * EPSILON)));
+  BOOST_CHECK(is_alongside(Radians(-4.0 * EPSILON), Radians(3.0),
+                           Radians(4.0 * EPSILON)));
+  BOOST_CHECK(is_alongside(Radians(3.0 + 4.0 * EPSILON), Radians(3.0),
+                           Radians(4.0 * EPSILON)));
+  BOOST_CHECK(!is_alongside(Radians(3.0 + 6.0 * EPSILON), Radians(3.0),
+                            Radians(4.0 * EPSILON)));
+}
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
 BOOST_AUTO_TEST_CASE(test_is_within) {
   BOOST_CHECK(!is_within(-2.0 * EPSILON, 2.0));
   BOOST_CHECK(is_within(-EPSILON, 2.0));

@@ -355,6 +355,26 @@ public:
     return vector::calculate_atd_and_xtd(a_, pole_, point);
   }
 
+  /// Calculate the shortest great-circle distance of a point from the `Arc`.
+  /// @param point the point.
+  ///
+  /// @return the shortest distance of a point from the `Arc` in Radians.
+  [[nodiscard("Pure Function")]]
+  constexpr auto
+  shortest_distance(const vector::Vector3<T> &point) const noexcept
+      -> Radians<T> {
+    const auto [atd, xtd]{calculate_atd_and_xtd(point)};
+    if (vector::intersection::is_alongside(
+            atd, length_, Radians<T>(4 * std::numeric_limits<T>::epsilon()))) {
+      return xtd.abs();
+    } else {
+      const auto sq_a{vector::sq_distance(a_, point)};
+      const auto sq_b{vector::sq_distance(b(), point)};
+      const auto sq_d{std::min(sq_a, sq_b)};
+      return great_circle::e2gc_distance(std::sqrt(sq_d));
+    }
+  }
+
   /// A Python representation of an Arc.
   /// @return a string in Python repr format.
   [[nodiscard("Pure Function")]]

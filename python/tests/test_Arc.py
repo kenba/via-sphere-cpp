@@ -127,6 +127,10 @@ def test_arc_atd_and_xtd():
         assert_almost_equal(deg2rad(1.0), atd.v())
         assert_almost_equal(expected, xtd.v())
 
+        d = arc.shortest_distance(point)
+        assert_almost_equal(abs(expected), d.v())
+
+
 def test_arc_intersection_point():
     # Karney's example:
     # Istanbul, Washington, Reyjavik and Accra

@@ -69,6 +69,23 @@ calculate_intersection_distances(const Vector3<T> &a1, const Vector3<T> &pole1,
           calculate_great_circle_atd(a2, pole2, c)};
 }
 
+/// Whether an along track distance is within an `Arc` length including
+/// tolerance.
+/// @param distance the along track distance from the start of the `Arc`.
+/// @param length the length of the `Arc`.
+/// @param tolerance the distance tolerance.
+///
+/// @return true if the along track distance is within the length including
+/// tolerance, false otherwise.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto is_alongside(const Radians<T> distance, const Radians<T> length,
+                            const Radians<T> tolerance) noexcept -> bool {
+  return (-tolerance.v() <= distance.v()) &&
+         (distance.v() <= length.v() + tolerance.v());
+}
+
 /// Whether an intersection point is within an `Arc`.
 /// @param distance the along track distance to the point from the start of the
 /// `Arc`.
@@ -102,14 +119,16 @@ calculate_coincident_arc_distances(const Radians<T> gc_d, const bool reciprocal,
     -> std::tuple<Radians<T>, Radians<T>> {
   if (reciprocal) {
     // if the arcs intersect
-    if (is_within(gc_d.v(), std::max(arc1_length.v(), arc2_length.v()))) {
+    if (is_alongside(gc_d,
+                     Radians<T>(std::max(arc1_length.v(), arc2_length.v())),
+                     Radians<T>(4 * std::numeric_limits<T>::epsilon()))) {
       // The start of the first `Arc` is within the second `Arc`
       if (gc_d.v() <= arc2_length.v())
         // The start of the first `Arc` is within the second `Arc`
-        return {Radians<T>(0), gc_d};
+        return {Radians<T>(0), gc_d.clamp(arc2_length)};
       else
         // The start of the second `Arc` is within the first `Arc`
-        return {gc_d, Radians<T>(0)};
+        return {gc_d.clamp(arc1_length), Radians<T>(0)};
     } else {
       const auto abs_d{gc_d.abs()};
 

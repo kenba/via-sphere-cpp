@@ -212,6 +212,7 @@ PYBIND11_MODULE(via_sphere, m) {
       .def("angle_position", &via::Arc<double>::angle_position)
       .def("end_arc", &via::Arc<double>::end_arc)
       .def("calculate_atd_and_xtd", &via::Arc<double>::calculate_atd_and_xtd)
+      .def("shortest_distance", &via::Arc<double>::shortest_distance)
 
       .def("__repr__", &via::Arc<double>::python_repr);
 

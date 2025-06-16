@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2024 Ken Barker
+// Copyright (c) 2018-2025 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -250,7 +250,27 @@ BOOST_AUTO_TEST_CASE(test_arc_atd_and_xtd) {
     const auto [atd, xtd]{arc.calculate_atd_and_xtd(point)};
     BOOST_CHECK_CLOSE(trig::deg2rad(1.0), atd.v(), CALCULATION_TOLERANCE);
     BOOST_CHECK_CLOSE(expected, xtd.v(), 2 * CALCULATION_TOLERANCE);
+
+    const auto d{arc.shortest_distance(point)};
+    BOOST_CHECK_CLOSE(std::abs(expected), d.v(), 2 * CALCULATION_TOLERANCE);
   }
+
+  auto point = g_eq.to_point();
+  auto d = arc.shortest_distance(point);
+  BOOST_CHECK_EQUAL(Radians(0.0), d);
+
+  point = e_eq.to_point();
+  d = arc.shortest_distance(point);
+  BOOST_CHECK_EQUAL(Radians(0.0), d);
+
+  const LatLong<double> latlong(Degrees(0.0), Degrees(-1.0));
+  point = latlong.to_point();
+  d = arc.shortest_distance(point);
+  BOOST_CHECK_CLOSE(trig::deg2rad(1.0), d.v(), CALCULATION_TOLERANCE);
+
+  point = -point;
+  d = arc.shortest_distance(point);
+  BOOST_CHECK_CLOSE(trig::deg2rad(89.0), d.v(), CALCULATION_TOLERANCE);
 }
 //////////////////////////////////////////////////////////////////////////////
 
