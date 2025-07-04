@@ -262,6 +262,10 @@ BOOST_AUTO_TEST_CASE(test_calculate_cross_track_distance_and_square) {
     const LatLong<double> latlong(Degrees<double>(latitude), longitude);
     const Vector3<double> point{latlong.to_point()};
 
+    BOOST_CHECK_EQUAL(latitude < 0, is_right_of(pole_0, point));
+    BOOST_CHECK_EQUAL(latitude < 0, is_south_of(point, g_eq));
+    BOOST_CHECK_EQUAL(latitude >= 0, !is_south_of(point, e_eq));
+
     const double expected{trig::deg2rad(static_cast<double>(latitude))};
     const auto xtd{cross_track_distance(pole_0, point)};
 

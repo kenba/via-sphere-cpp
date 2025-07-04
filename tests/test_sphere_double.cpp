@@ -67,6 +67,13 @@ BOOST_AUTO_TEST_CASE(test_latlong_class) {
   BOOST_CHECK_EQUAL(Degrees(0.0), a.lat());
   BOOST_CHECK_EQUAL(Degrees(90.0), a.lon());
 
+  BOOST_CHECK(!a.is_south_of(a));
+  BOOST_CHECK(!a.is_west_of(a));
+
+  const LatLong<double> b(Degrees(-10.0), Degrees(-91.0));
+  BOOST_CHECK(b.is_south_of(a));
+  BOOST_CHECK(b.is_west_of(a));
+
   //
   // const LatLong<double> invalid_lat(Degrees(91.0), Degrees(0.0));
   // const LatLong<double> invalid_lon(Degrees(0.0), Degrees(181.0));

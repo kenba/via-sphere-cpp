@@ -204,6 +204,19 @@ constexpr auto delta_longitude(const Vector3<T> &a,
   return Angle<T>::from_y_x(perp_product(b, a), dot2d(b, a));
 }
 
+/// Determine whether point a is South of point b.
+/// It calculates and compares the z component of the two points.
+/// @param a, b the points.
+///
+/// @return true if a is South of b, false otherwise.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto is_south_of(const Vector3<T> &a, const Vector3<T> &b) noexcept
+    -> bool {
+  return a(2) < b(2);
+}
+
 /// Determine whether point a is West of point b.
 /// It calculates and compares the perp product of the two points.
 /// @param a, b the points.
@@ -214,7 +227,7 @@ template <typename T>
 [[nodiscard("Pure Function")]]
 constexpr auto is_west_of(const Vector3<T> &a, const Vector3<T> &b) noexcept
     -> bool {
-  return perp_product(b, a) <= -std::numeric_limits<T>::epsilon();
+  return perp_product(b, a) < T();
 }
 
 /// Calculate the right hand pole vector of a Great Circle from an initial
@@ -363,6 +376,22 @@ template <typename T>
 constexpr auto sin_xtd(const Vector3<T> &pole, const Vector3<T> &point) noexcept
     -> trig::UnitNegRange<T> {
   return trig::UnitNegRange<T>::clamp(pole.dot(point));
+}
+
+/// Determine whether point is right of a Great Circle pole.
+/// It compares the dot product of the pole and point.
+/// @param pole the Great Circle pole.
+/// @param point the point.
+///
+///
+/// @return true if the point is right of the pole,
+/// false if on or to the left of the Great Circle.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto is_right_of(const Vector3<T> &pole,
+                           const Vector3<T> &point) noexcept -> bool {
+  return pole.dot(point) < T();
 }
 
 /// The across track distance of a point relative to a Great Circle pole.

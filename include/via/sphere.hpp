@@ -105,6 +105,26 @@ public:
     return lon_;
   }
 
+  /// Determine whether the `LatLong` is South of a.
+  /// It compares the latitude of the two points.
+  /// @param a the other point.
+  ///
+  /// @return true if a is South of b, false otherwise.
+  [[nodiscard("Pure Function")]]
+  constexpr auto is_south_of(const LatLong<T> &a) const noexcept -> bool {
+    return lat_.v() < a.lat_.v();
+  }
+
+  /// Determine whether the `LatLong` is West of a.
+  /// It compares the longitude difference of the two points.
+  /// @param a the other point.
+  ///
+  /// @return true if a is West of b, false otherwise.
+  [[nodiscard("Pure Function")]]
+  constexpr auto is_west_of(const LatLong<T> &a) const noexcept -> bool {
+    return (a.lon_ - lon_).v() < T();
+  }
+
   /// Convert a `LatLong` to a point on the unit sphere
   [[nodiscard("Pure Function")]]
   constexpr auto to_point() const -> vector::Vector3<T> {
