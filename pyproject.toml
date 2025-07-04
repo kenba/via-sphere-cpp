@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "via_sphere"
-version = "0.5.1"
+version = "0.5.2"
 
 [tool.scikit-build]
 cmake.build-type = "RelWithDebInfo"

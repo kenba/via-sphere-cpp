@@ -95,6 +95,8 @@ PYBIND11_MODULE(via_sphere, m) {
         "Determine whether two `Vector3`s are orthogonal (perpendicular).");
   m.def("delta_longitude", &via::vector::delta_longitude<double>,
         "Calculate the relative longitude of point a from point b.");
+  m.def("is_south_of", &via::vector::is_south_of<double>,
+        "Determine whether point a is South of point b.");
   m.def("is_west_of", &via::vector::is_west_of<double>,
         "Determine whether point a is West of point b.");
   m.def("calculate_pole", &via::vector::calculate_pole<double>,
@@ -117,6 +119,8 @@ PYBIND11_MODULE(via_sphere, m) {
   m.def("sin_xtd", &via::vector::sin_xtd<double>,
         "The sine of the across track distance of a point relative to a Great "
         "Circle pole.");
+  m.def("is_right_of", &via::vector::is_right_of<double>,
+        "Determine whether point is right of a Great Circle pole.");
   m.def(
       "cross_track_distance", &via::vector::cross_track_distance<double>,
       "The across track distance of a point relative to a Great Circle pole.");
@@ -172,6 +176,8 @@ PYBIND11_MODULE(via_sphere, m) {
       .def("is_valid", &via::LatLong<double>::is_valid)
       .def("lat", &via::LatLong<double>::lat)
       .def("lon", &via::LatLong<double>::lon)
+      .def("is_south_of", &via::LatLong<double>::is_south_of)
+      .def("is_west_of", &via::LatLong<double>::is_west_of)
       .def("to_point", &via::LatLong<double>::to_point)
       .def("__repr__", &via::LatLong<double>::python_repr)
 

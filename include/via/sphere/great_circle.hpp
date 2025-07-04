@@ -179,7 +179,7 @@ constexpr auto calculate_sigma(const Angle<T> a_lat, const Angle<T> b_lat,
 }
 
 /// Calculate the latitude at great circle distance, sigma.
-/// @param a_lat the latitude of the start point.
+/// @param lat the latitude of the start point.
 /// @param azi the azimuth at a_lat.
 /// @param sigma the distance on the auxiliary sphere as an Angle.
 ///
@@ -204,7 +204,7 @@ constexpr auto calculate_latitude(const Angle<T> lat, const Angle<T> azi,
 }
 
 /// Calculate the longitude difference at great circle distance, sigma.
-/// @param a_lat the latitude of the start point.
+/// @param lat the latitude of the start point.
 /// @param azi the azimuth at a_lat.
 /// @param sigma the distance on the auxiliary sphere as an Angle.
 ///

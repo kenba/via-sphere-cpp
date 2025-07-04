@@ -56,6 +56,13 @@ def test_latlong_class():
     assert Degrees(0.0) == a.lat()
     assert Degrees(90.0) == a.lon()
 
+    assert not a.is_south_of(a)
+    assert not a.is_west_of(a)
+
+    b = LatLong(Degrees(-10.0), Degrees(-91.0))
+    assert b.is_south_of(a)
+    assert b.is_west_of(a)
+
 def test_latlong_vector3_conversion():
     a = LatLong(Degrees(0.0), Degrees(90.0))
     point = a.to_point()
