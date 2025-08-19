@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE(test_arc_atd_and_xtd) {
   d = arc.shortest_distance(point);
   BOOST_CHECK_EQUAL(Radians(0.0), d);
 
-  const LatLong<double> latlong(Degrees(0.0), Degrees(-1.0));
+  LatLong<double> latlong(Degrees(0.0), Degrees(-1.0));
   point = latlong.to_point();
   d = arc.shortest_distance(point);
   BOOST_CHECK_CLOSE(trig::deg2rad(1.0), d.v(), CALCULATION_TOLERANCE);
@@ -278,6 +278,14 @@ BOOST_AUTO_TEST_CASE(test_arc_atd_and_xtd) {
   point = -point;
   d = arc.shortest_distance(point);
   BOOST_CHECK_CLOSE(trig::deg2rad(89.0), d.v(), CALCULATION_TOLERANCE);
+
+  // a point closer to the end of the arc than the start
+  latlong = LatLong<double>(Degrees(0.0), Degrees(-160.0));
+  point = latlong.to_point();
+  d = arc.shortest_distance(point);
+  // shortest distance is from the end of the arc to the point
+  BOOST_CHECK_EQUAL(
+      great_circle::e2gc_distance(vector::distance(arc.b(), point)), d);
 }
 //////////////////////////////////////////////////////////////////////////////
 

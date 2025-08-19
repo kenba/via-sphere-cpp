@@ -33,6 +33,7 @@
 ///
 //////////////////////////////////////////////////////////////////////////////
 #include "via/sphere/intersection.hpp"
+#include <cmath>
 
 namespace via {
 
@@ -320,7 +321,7 @@ public:
   /// The mid point of the `Arc`.
   [[nodiscard("Pure Function")]]
   constexpr auto mid_point() const noexcept -> vector::Vector3<T> {
-    return position(Radians<T>(length_.v() / 2));
+    return position(length_.half());
   }
 
   /// The position of a perpendicular point at distance from the `Arc`.
@@ -388,10 +389,10 @@ public:
             atd, length_, Radians<T>(4 * std::numeric_limits<T>::epsilon()))) {
       return xtd.abs();
     } else {
-      const auto sq_a{vector::sq_distance(a_, point)};
-      const auto sq_b{vector::sq_distance(b(), point)};
-      const auto sq_d{std::min(sq_a, sq_b)};
-      return great_circle::e2gc_distance(std::sqrt(sq_d));
+      // adjust atd to measure the distance from the centre of the Arc
+      const auto atd_centre{atd - length_.half()};
+      const auto p{std::signbit(atd_centre.v()) ? a_ : b()};
+      return great_circle::e2gc_distance(vector::distance(p, point));
     }
   }
 
