@@ -557,5 +557,34 @@ constexpr auto calculate_atd_and_xtd(const Vector3<T> &a,
 
   return {atd, xtd};
 }
+
+/// Normalise a centroid on coincident great circles.
+///
+/// Note: it handles the case where the centroid is too small to normalise.
+///
+/// @param centroid the centroid to be normalised.
+/// @param point a mid-point.
+/// @param pole the pole of the Great Circle arc.
+///
+/// @return the normalise centroid.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto normalise_centroid(const Vector3<T> &centroid,
+                                  const Vector3<T> &point,
+                                  const Vector3<T> &pole) noexcept
+    -> Vector3<T> {
+  const auto c{normalise<T>(centroid, MIN_SQ_NORM<T>)};
+  if (c.has_value()) {
+    return c.value();
+  } else {
+    // centroid is half way between points
+
+    // calculate a point on the coincident great circle
+    // half way between points, closer to the start of the arc
+    return position(point, direction(point, pole),
+                    Angle<T>().quarter_turn_ccw());
+  }
+}
 } // namespace vector
 } // namespace via

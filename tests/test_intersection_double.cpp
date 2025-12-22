@@ -189,5 +189,90 @@ BOOST_AUTO_TEST_CASE(test_use_antipodal_point) {
 }
 //////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////
+BOOST_AUTO_TEST_CASE(
+    test_calculate_arc_reference_distances_and_angle_coincident_great_circles) {
+  const Vector3<double> point_1(1.0, 0.0, 0.0);
+  const Vector3<double> pole_1(0.0, 0.0, 1.0);
+
+  // same mid points and great circles
+  const auto result_0 = calculate_arc_reference_distances_and_angle(
+      point_1, pole_1, point_1, pole_1);
+  BOOST_CHECK_EQUAL(Radians(0.0), get<0>(result_0));
+  BOOST_CHECK_EQUAL(Radians(0.0), get<1>(result_0));
+  BOOST_CHECK_EQUAL(Degrees(0.0), get<2>(result_0).to_degrees());
+
+  // opposite mid points and same great circles
+  const Vector3<double> point_m1{-point_1};
+  const auto result_1 = calculate_arc_reference_distances_and_angle(
+      point_1, pole_1, point_m1, pole_1);
+  BOOST_CHECK_CLOSE(-trig::PI_2<double>, get<0>(result_1).v(),
+                    CALCULATION_TOLERANCE);
+  BOOST_CHECK_CLOSE(trig::PI_2<double>, get<1>(result_1).v(),
+                    CALCULATION_TOLERANCE);
+  BOOST_CHECK_EQUAL(Degrees(0.0), get<2>(result_1).to_degrees());
+
+  // opposite mid points and great circles
+  const Vector3<double> pole_m1{-pole_1};
+  const auto result_2 = calculate_arc_reference_distances_and_angle(
+      point_1, pole_1, point_m1, pole_m1);
+  BOOST_CHECK_CLOSE(-trig::PI_2<double>, get<0>(result_2).v(),
+                    CALCULATION_TOLERANCE);
+  BOOST_CHECK_CLOSE(-trig::PI_2<double>, get<1>(result_2).v(),
+                    CALCULATION_TOLERANCE);
+  BOOST_CHECK_EQUAL(Degrees(180.0), get<2>(result_2).to_degrees());
+}
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+BOOST_AUTO_TEST_CASE(
+    test_calculate_arc_reference_distances_and_angle_intersecting_great_circles) {
+  const Vector3<double> point_1(1.0, 0.0, 0.0);
+  const Vector3<double> pole_1(0.0, 0.0, 1.0);
+  const Vector3<double> pole_2(0.0, 1.0, 0.0);
+
+  // intersection, same mid points
+  const auto result_0 = calculate_arc_reference_distances_and_angle(
+      point_1, pole_1, point_1, pole_2);
+  BOOST_CHECK_EQUAL(Radians(0.0), get<0>(result_0));
+  BOOST_CHECK_EQUAL(Radians(0.0), get<1>(result_0));
+  BOOST_CHECK_EQUAL(Degrees(90.0), get<2>(result_0).to_degrees());
+
+  // intersection, same mid points, acute angle
+  const Vector3<double> pole_3{(pole_1 + pole_2).normalized()};
+  const auto result_1 = calculate_arc_reference_distances_and_angle(
+      point_1, pole_1, point_1, pole_3);
+  BOOST_CHECK_EQUAL(Radians(0.0), get<0>(result_1));
+  BOOST_CHECK_EQUAL(Radians(0.0), get<1>(result_1));
+  BOOST_CHECK_EQUAL(Degrees(45.0), get<2>(result_1).to_degrees());
+
+  // intersection, same mid points, obtuse angle
+  const Vector3<double> pole_m3{-pole_3};
+  const auto result_2 = calculate_arc_reference_distances_and_angle(
+      point_1, pole_1, point_1, pole_m3);
+  BOOST_CHECK_EQUAL(Radians(0.0), get<0>(result_2));
+  BOOST_CHECK_EQUAL(Radians(0.0), get<1>(result_2));
+  BOOST_CHECK_EQUAL(Degrees(135.0), get<2>(result_2).to_degrees());
+
+  // intersection, different mid points, acute angle
+  const Vector3<double> point_2{position(point_1, direction(point_1, pole_3),
+                                         Angle<double>().quarter_turn_cw())};
+  const auto result_3 = calculate_arc_reference_distances_and_angle(
+      point_1, pole_1, point_2, pole_3);
+  BOOST_CHECK_EQUAL(Radians(0.0), get<0>(result_3));
+  BOOST_CHECK_CLOSE(-trig::PI_2<double>, get<1>(result_3).v(),
+                    CALCULATION_TOLERANCE);
+  BOOST_CHECK_EQUAL(Degrees(45.0), get<2>(result_3).to_degrees());
+
+  // intersection, different mid points, obtuse angle
+  const auto result_4 = calculate_arc_reference_distances_and_angle(
+      point_1, pole_1, point_2, pole_m3);
+  BOOST_CHECK_EQUAL(Radians(0.0), get<0>(result_4));
+  BOOST_CHECK_CLOSE(trig::PI_2<double>, get<1>(result_4).v(),
+                    CALCULATION_TOLERANCE);
+  BOOST_CHECK_EQUAL(Degrees(135.0), get<2>(result_4).to_degrees());
+}
+//////////////////////////////////////////////////////////////////////////////
+
 BOOST_AUTO_TEST_SUITE_END()
 //////////////////////////////////////////////////////////////////////////////

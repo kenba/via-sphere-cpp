@@ -357,5 +357,26 @@ BOOST_AUTO_TEST_CASE(test_special_cases) {
 }
 //////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////
+BOOST_AUTO_TEST_CASE(test_normalise_centroid) {
+  // Greenwich equator
+  const Vector3<double> point_1(1.0, 0.0, 0.0);
+  const Vector3<double> pole_1(0.0, 0.0, 1.0);
+
+  const Vector3<double> point_m1 = -point_1;
+  const Vector3<double> point_0 = point_1 + point_m1;
+  const Vector3<double> result_0 = normalise_centroid(point_0, point_1, pole_1);
+  BOOST_CHECK_EQUAL(Vector3<double>(0.0, -1.0, 0.0), result_0);
+
+  const Vector3<double> result_1 =
+      normalise_centroid(point_0, point_m1, pole_1);
+  BOOST_CHECK_EQUAL(Vector3<double>(0.0, 1.0, 0.0), result_1);
+
+  const Vector3<double> point_2 = point_1 + point_1;
+  const Vector3<double> result_2 = normalise_centroid(point_2, point_1, pole_1);
+  BOOST_CHECK_EQUAL(point_1, result_2);
+}
+//////////////////////////////////////////////////////////////////////////////
+
 BOOST_AUTO_TEST_SUITE_END()
 //////////////////////////////////////////////////////////////////////////////

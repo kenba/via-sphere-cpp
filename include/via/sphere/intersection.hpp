@@ -214,6 +214,67 @@ constexpr auto calculate_intersection_point_distances(
   }
 }
 
+/// Determine the reference point of a pair of arcs.
+/// I.e. the closest intersection point if they intersect or the
+/// centroid normalized to lie on the unit sphere if they don't.
+///
+/// @param mid_point_0, mid_point_1 the mid points of the `Arc`s.
+/// @param pole_0, `pole_1` the poles of the `Arc` great circles.
+///
+/// @return the closest intersection point or normalized centroid and the
+/// sine of the angle between the arcs, zero if the arcs are coincident.
+/// And the absolute relative angle at the intersection point or centroid.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto calculate_reference_point_and_angle(
+    const Vector3<T> &mid_point_0, const Vector3<T> &pole_0,
+    const Vector3<T> &mid_point_1, const Vector3<T> &pole_1) noexcept
+    -> std::tuple<Vector3<T>, Angle<T>> {
+  const Vector3<T> centroid{(mid_point_0 + mid_point_1)};
+  const Vector3<T> point{pole_0.cross(pole_1)};
+  const auto p{normalise(point, MIN_SQ_NORM<T>)};
+  if (p.has_value()) {
+    // find the closest intersection point to both the arcs
+    const Vector3<T> x{use_antipodal_point(p.value(), centroid) ? -p.value()
+                                                                : p.value()};
+    return {x, Angle<T>::from_y_x(point.norm(), pole_0.dot(pole_1))};
+  } else {
+    // the great circles are coincident
+    const Vector3<T> c{normalise_centroid(centroid, mid_point_0, pole_0)};
+    const Angle<T> angle{
+        std::signbit(pole_0.dot(pole_1)) ? Angle<T>().opposite() : Angle<T>()};
+
+    return {c, angle};
+  }
+}
+
+/// Calculate signed great circle distances from two arc mid points to their
+/// closest intersection point or normalized centroid if the arcs are on
+/// coincident great circles.
+///
+/// @param mid_point_0, mid_point_1 the mid points of the arcs.
+/// @param pole_0, pole_1 the poles of the arc great circles.
+///
+/// @return the signed great circle distances of the closest intersection
+/// point or centroid  from the arc mid points in `Radians`,
+/// and the relative angle between the arc great circles.
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto calculate_arc_reference_distances_and_angle(
+    const Vector3<T> &mid_point_0, const Vector3<T> &pole_0,
+    const Vector3<T> &mid_point_1, const Vector3<T> &pole_1) noexcept
+    -> std::tuple<Radians<T>, Radians<T>, Angle<T>> {
+  const auto [point, angle]{calculate_reference_point_and_angle(
+      mid_point_0, pole_0, mid_point_1, pole_1)};
+  const Radians<T> distance_0{
+      calculate_great_circle_atd(mid_point_0, pole_0, point)};
+  const Radians<T> distance_1{
+      calculate_great_circle_atd(mid_point_1, pole_1, point)};
+  return {distance_0, distance_1, angle};
+}
+
 } // namespace intersection
 } // namespace vector
 } // namespace via
