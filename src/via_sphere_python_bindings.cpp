@@ -147,6 +147,8 @@ PYBIND11_MODULE(via_sphere, m) {
   m.def("calculate_atd_and_xtd", &via::vector::calculate_atd_and_xtd<double>,
         "Calculate the along track and across track distance of a point from "
         "the start of an Arc.");
+  m.def("normalise_centroid", &via::vector::normalise_centroid<double>,
+        "Normalise a centroid on coincident great circles.");
 
   // Python bindings for vector intersection functions
   m.def("calculate_intersection",
@@ -158,6 +160,14 @@ PYBIND11_MODULE(via_sphere, m) {
         "Calculate the great circle distances to an intersection point from "
         "the start points of a pair of great circle arcs, on different great "
         "circles.");
+  m.def("calculate_reference_point_and_angle",
+        &via::vector::intersection::calculate_reference_point_and_angle<double>,
+        "Determine the reference point of a pair of arcs.");
+  m.def("calculate_arc_reference_distances_and_angle",
+        &via::vector::intersection::calculate_arc_reference_distances_and_angle<
+            double>,
+        "Calculate signed great circle distances from two arc mid points to "
+        "their closest intersection point or normalized centroid.");
 
   // Python bindings for sphere functions
   m.def("is_valid_latitude", &via::is_valid_latitude<double>,
