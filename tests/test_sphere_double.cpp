@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2025 Ken Barker
+// Copyright (c) 2018-2026 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -332,11 +332,17 @@ BOOST_AUTO_TEST_CASE(test_arc_intersection_same_great_circles) {
   const Arc<double> arc1(south_pole_1, south_pole_2);
 
   const auto intersection_lengths{calculate_intersection_distances(arc1, arc1)};
-  BOOST_CHECK_EQUAL(Radians(0.0), std::get<0>(intersection_lengths));
-  BOOST_CHECK_EQUAL(Radians(0.0), std::get<1>(intersection_lengths));
+  BOOST_CHECK_EQUAL(arc1.length().half(), std::get<0>(intersection_lengths));
+  BOOST_CHECK_EQUAL(arc1.length().half(), std::get<1>(intersection_lengths));
 
   const auto intersection_point_1{calculate_intersection_point(arc1, arc1)};
   BOOST_CHECK(intersection_point_1.has_value());
+  BOOST_CHECK_CLOSE(
+      arc1.length().half().v(),
+      great_circle::e2gc_distance(
+          vector::distance(arc1.a(), intersection_point_1.value()))
+          .v(),
+      1e-9);
 
   const LatLong<double> south_pole_3(Degrees(-85.0), Degrees(0.0));
   const LatLong<double> south_pole_4(Degrees(-86.0), Degrees(0.0));

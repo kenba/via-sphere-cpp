@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2025 Ken Barker.
+// Copyright (c) 2018-2026 Ken Barker.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -155,11 +155,12 @@ PYBIND11_MODULE(via_sphere, m) {
         &via::vector::intersection::calculate_intersection<double>,
         "Calculate an intersection point between the poles of two Great "
         "Circles.");
-  m.def("calculate_intersection_distances",
-        &via::vector::intersection::calculate_intersection_distances<double>,
-        "Calculate the great circle distances to an intersection point from "
-        "the start points of a pair of great circle arcs, on different great "
-        "circles.");
+  m.def("use_antipodal_point",
+        &via::vector::intersection::use_antipodal_point<double>,
+        "Determine whether the antipodal point is closer to the centroid.");
+  m.def("closest_intersection_point",
+        &via::vector::intersection::closest_intersection_point<double>,
+        "Return the closer intersection point to the centroid.");
   m.def("calculate_reference_point_and_angle",
         &via::vector::intersection::calculate_reference_point_and_angle<double>,
         "Determine the reference point of a pair of arcs.");

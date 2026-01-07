@@ -1,7 +1,7 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2025 Ken Barker
+// Copyright (c) 2018-2026 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -34,6 +34,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "via/sphere/intersection.hpp"
 #include <cmath>
+#include <via/angle.hpp>
 
 namespace via {
 
@@ -385,8 +386,8 @@ public:
   shortest_distance(const vector::Vector3<T> &point) const noexcept
       -> Radians<T> {
     const auto [atd, xtd]{calculate_atd_and_xtd(point)};
-    if (vector::intersection::is_alongside(
-            atd, length_, Radians<T>(4 * std::numeric_limits<T>::epsilon()))) {
+    if (-great_circle::MIN_VALUE<T> <= atd.v() &&
+        atd.v() <= length_.v() + great_circle::MIN_VALUE<T>) {
       return xtd.abs();
     } else {
       // adjust atd to measure the distance from the centre of the Arc
@@ -414,6 +415,16 @@ public:
   }
 };
 
+/// Arc equality operator
+template <typename T>
+  requires std::floating_point<T>
+[[nodiscard("Pure Function")]]
+constexpr auto operator==(const Arc<T> &lhs, const Arc<T> &rhs) noexcept
+    -> bool {
+  return lhs.a() == rhs.a() && lhs.pole() == rhs.pole() &&
+         lhs.length() == rhs.length() && lhs.half_width() == rhs.half_width();
+}
+
 /// Calculate the great-circle distances along a pair of `Arc`s to their
 /// closest intersection point or their coincident arc distances if the
 /// `Arc`s are on coincident Great Circles.
@@ -428,10 +439,11 @@ template <typename T>
 constexpr auto calculate_intersection_distances(const Arc<T> &arc1,
                                                 const Arc<T> &arc2) noexcept
     -> std::tuple<Radians<T>, Radians<T>> {
-  const auto centroid{(arc1.mid_point() + arc2.mid_point()) / 2};
-  return vector::intersection::calculate_intersection_point_distances<T>(
-      arc1.a(), arc1.pole(), arc1.length(), arc2.a(), arc2.pole(),
-      arc2.length(), centroid);
+  const auto [distance_0, distance_1, angle]{
+      vector::intersection::calculate_arc_reference_distances_and_angle(
+          arc1.mid_point(), arc1.pole(), arc2.mid_point(), arc2.pole())};
+
+  return {distance_0 + arc1.length().half(), distance_1 + arc2.length().half()};
 }
 
 /// Calculate whether a pair of `Arc`s intersect and (if so) where.
@@ -444,11 +456,27 @@ template <typename T>
 constexpr auto calculate_intersection_point(const Arc<T> &arc1,
                                             const Arc<T> &arc2) noexcept
     -> std::optional<vector::Vector3<T>> {
-  const auto [distance1,
-              distance2]{calculate_intersection_distances(arc1, arc2)};
-  if (vector::intersection::is_within(distance1.v(), arc1.length().v()) &&
-      vector::intersection::is_within(distance2.v(), arc2.length().v())) {
-    return arc1.position(distance1);
+  const auto [point,
+              angle]{vector::intersection::calculate_reference_point_and_angle(
+      arc1.mid_point(), arc1.pole(), arc2.mid_point(), arc2.pole())};
+
+  const Radians<T> distance_0{
+      vector::calculate_great_circle_atd(arc1.mid_point(), arc1.pole(), point)};
+  const Radians<T> distance_1{
+      vector::calculate_great_circle_atd(arc2.mid_point(), arc2.pole(), point)};
+
+  const bool arcs_are_coincident{angle.sin().v() == T()};
+  const bool arcs_intersect_or_overlap{
+      arcs_are_coincident
+          ? distance_0.abs().v() + distance_1.abs().v() <=
+                arc1.length().half().v() + arc2.length().half().v() +
+                    great_circle::MIN_VALUE<T>
+          : (distance_0.abs().v() <=
+             arc1.length().half().v() + great_circle::MIN_VALUE<T>) &&
+                (distance_1.abs().v() <=
+                 arc2.length().half().v() + great_circle::MIN_VALUE<T>)};
+  if (arcs_intersect_or_overlap) {
+    return point;
   }
 
   return std::nullopt;

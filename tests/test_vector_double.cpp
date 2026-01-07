@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2025 Ken Barker
+// Copyright (c) 2018-2026 Ken Barker
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"),
@@ -62,6 +62,8 @@ BOOST_AUTO_TEST_CASE(test_point_lat_longs) {
   // Test South pole
   const LatLong lat_lon_south(Degrees(-90.0), Degrees(180.0));
   const Vector3<double> point_south{lat_lon_south.to_point()};
+  BOOST_CHECK(is_unit(point_south));
+  BOOST_CHECK_EQUAL(Vector3<double>(0.0, 0.0, -1.0), point_south);
 
   BOOST_CHECK_EQUAL(Degrees(-90.0), latitude(point_south).to_degrees());
   BOOST_CHECK_EQUAL(Degrees(0.0), longitude(point_south).to_degrees());
@@ -75,12 +77,14 @@ BOOST_AUTO_TEST_CASE(test_point_lat_longs) {
   const LatLong lat_lon_0_0(Degrees(0.0), Degrees(0.0));
   const Vector3<double> point_0{lat_lon_0_0.to_point()};
   BOOST_CHECK(is_unit(point_0));
+  BOOST_CHECK_EQUAL(Vector3<double>(1.0, 0.0, 0.0), point_0);
   BOOST_CHECK_EQUAL(lat_lon_0_0, LatLong(point_0));
 
-  // Test IDL equator
+  // Test antimeridian equator
   const LatLong lat_lon_0_180(Degrees(0.0), Degrees(180.0));
   const Vector3<double> point_1{lat_lon_0_180.to_point()};
   BOOST_CHECK(is_unit(point_1));
+  BOOST_CHECK_EQUAL(Vector3<double>(-1.0, 0.0, 0.0), point_1);
   BOOST_CHECK_EQUAL(lat_lon_0_180, LatLong(point_1));
   BOOST_CHECK(!is_west_of(point_0, point_1));
   BOOST_CHECK_EQUAL(Radians(-trig::PI<double>),
@@ -89,6 +93,7 @@ BOOST_AUTO_TEST_CASE(test_point_lat_longs) {
   const LatLong lat_lon_0_m180(Degrees(0.0), Degrees(-180.0));
   const Vector3<double> point_2{lat_lon_0_m180.to_point()};
   BOOST_CHECK(is_unit(point_2));
+  BOOST_CHECK_EQUAL(Vector3<double>(-1.0, 0.0, 0.0), point_2);
   // Converts back to +ve longitude
   BOOST_CHECK_EQUAL(lat_lon_0_180, LatLong(point_2));
   BOOST_CHECK(!is_west_of(point_0, point_2));
