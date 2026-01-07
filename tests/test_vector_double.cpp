@@ -48,8 +48,8 @@ BOOST_AUTO_TEST_CASE(test_normalise) {
   BOOST_CHECK(!normalise(too_small, MIN_SQ_NORM<double>));
 
   // A vector just large enough to normalize
-  const Vector3<double> small(16384 * std::numeric_limits<double>::epsilon(),
-                              0.0, 0.0);
+  const Vector3<double> small(
+      16384 * std::numeric_limits<double>::epsilon(), 0.0, 0.0);
   BOOST_CHECK(!is_unit(small));
   const auto result{normalise(small, MIN_SQ_NORM<double>)};
   BOOST_CHECK(result.has_value());

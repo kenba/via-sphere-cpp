@@ -21,6 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "via/sphere.hpp"
 #include <boost/test/unit_test.hpp>
+#include <sstream>
 
 using namespace via;
 
@@ -93,6 +94,10 @@ BOOST_AUTO_TEST_CASE(test_vector3_double) {
   BOOST_CHECK_EQUAL(Degrees(90.0), vector::longitude(point).to_degrees());
 
   BOOST_CHECK_EQUAL(a, LatLong<double>(point));
+
+  std::ostringstream os;
+  os << a;
+  BOOST_CHECK(std::string("(0,90)") == os.str());
 }
 //////////////////////////////////////////////////////////////////////////////
 
