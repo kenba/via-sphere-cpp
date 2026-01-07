@@ -462,6 +462,7 @@ constexpr auto calculate_intersection_point(const Arc<T> &arc_0,
               angle]{vector::intersection::calculate_reference_point_and_angle(
       arc_0.mid_point(), arc_0.pole(), arc_1.mid_point(), arc_1.pole())};
 
+  // calculate distances to the intersection or centroid from arc mid points
   const Radians<T> distance_0{vector::calculate_great_circle_atd(
       arc_0.mid_point(), arc_0.pole(), point)};
   const Radians<T> distance_1{vector::calculate_great_circle_atd(
@@ -470,9 +471,11 @@ constexpr auto calculate_intersection_point(const Arc<T> &arc_0,
   const bool arcs_are_coincident{angle.sin().v() == T()};
   const bool arcs_intersect_or_overlap{
       arcs_are_coincident
+          // do coincident arcs overlap?
           ? distance_0.abs().v() + distance_1.abs().v() <=
                 arc_0.length().half().v() + arc_1.length().half().v() +
                     great_circle::MIN_VALUE<T>
+          // do great circles intersect inside both arcs?
           : (distance_0.abs().v() <=
              arc_0.length().half().v() + great_circle::MIN_VALUE<T>) &&
                 (distance_1.abs().v() <=
