@@ -80,10 +80,10 @@ BOOST_AUTO_TEST_CASE(test_arc_intersection_point) {
   const LatLong<double> reyjavik(Degrees(64.0), Degrees(-22.0));
   const LatLong<double> accra(Degrees(6.0), Degrees(0.0));
 
-  const Arc<double> arc1(istanbul, washington);
-  const Arc<double> arc2(reyjavik, accra);
+  const Arc<double> arc_0(istanbul, washington);
+  const Arc<double> arc_1(reyjavik, accra);
 
-  const auto intersection_point_1{calculate_intersection_point(arc1, arc2)};
+  const auto intersection_point_1{calculate_intersection_point(arc_0, arc_1)};
   BOOST_CHECK(intersection_point_1.has_value());
 
   const LatLong<double> latlong_1{intersection_point_1.value()};
@@ -108,10 +108,10 @@ def test_arc_intersection_point():
     reyjavik = LatLong(Degrees(64.0), Degrees(-22.0))
     accra = LatLong(Degrees(6.0), Degrees(0.0))
 
-    arc1 = Arc(istanbul, washington)
-    arc2 = Arc(reyjavik, accra)
+    arc_0 = Arc(istanbul, washington)
+    arc_1 = Arc(reyjavik, accra)
 
-    intersection_point_1 = calculate_intersection_point(arc1, arc2)
+    intersection_point_1 = calculate_intersection_point(arc_0, arc_1)
     latlong_1 = LatLong(intersection_point_1)
     assert_almost_equal(54.72, latlong_1.lat().v(), 0.05)
     assert_almost_equal(-14.56, latlong_1.lon().v(), 0.02)

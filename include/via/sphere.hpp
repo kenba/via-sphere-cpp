@@ -178,8 +178,9 @@ constexpr auto calculate_azimuth_and_distance(const LatLong<T> a,
           great_circle::calculate_gc_distance(a_lat, b_lat, delta_long)};
 }
 
-/// Calculate the distance along the great circle of point b from point a,
-/// see: [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula).
+/// Calculate the distance along the great circle of point b from point a.
+///
+/// See: [Haversine formula](https://en.wikipedia.org/wiki/Haversine_formula).
 /// This function is less accurate than `calculate_azimuth_and_distance`.
 /// @param a, b the start and end positions
 ///
@@ -428,7 +429,7 @@ constexpr auto operator==(const Arc<T> &lhs, const Arc<T> &rhs) noexcept
 /// Calculate the great-circle distances along a pair of `Arc`s to their
 /// closest intersection point or their coincident arc distances if the
 /// `Arc`s are on coincident Great Circles.
-/// @param arc1, arc2 the `Arc`s.
+/// @param arc_0, arc_1 the `Arc`s.
 ///
 /// @return the distances along the first `Arc` and second `Arc` to the
 /// intersection point or to their coincident arc distances if the `Arc`s do
@@ -436,45 +437,46 @@ constexpr auto operator==(const Arc<T> &lhs, const Arc<T> &rhs) noexcept
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
-constexpr auto calculate_intersection_distances(const Arc<T> &arc1,
-                                                const Arc<T> &arc2) noexcept
+constexpr auto calculate_intersection_distances(const Arc<T> &arc_0,
+                                                const Arc<T> &arc_1) noexcept
     -> std::tuple<Radians<T>, Radians<T>> {
   const auto [distance_0, distance_1, angle]{
       vector::intersection::calculate_arc_reference_distances_and_angle(
-          arc1.mid_point(), arc1.pole(), arc2.mid_point(), arc2.pole())};
+          arc_0.mid_point(), arc_0.pole(), arc_1.mid_point(), arc_1.pole())};
 
-  return {distance_0 + arc1.length().half(), distance_1 + arc2.length().half()};
+  return {distance_0 + arc_1.length().half(),
+          distance_1 + arc_1.length().half()};
 }
 
 /// Calculate whether a pair of `Arc`s intersect and (if so) where.
-/// @param arc1, arc2 the `Arc`s.
+/// @param arc_0, arc_1 the `Arc`s.
 ///
 /// @return the intersection point or `std::nullopt` if they don't intersect.
 template <typename T>
   requires std::floating_point<T>
 [[nodiscard("Pure Function")]]
-constexpr auto calculate_intersection_point(const Arc<T> &arc1,
-                                            const Arc<T> &arc2) noexcept
+constexpr auto calculate_intersection_point(const Arc<T> &arc_0,
+                                            const Arc<T> &arc_1) noexcept
     -> std::optional<vector::Vector3<T>> {
   const auto [point,
               angle]{vector::intersection::calculate_reference_point_and_angle(
-      arc1.mid_point(), arc1.pole(), arc2.mid_point(), arc2.pole())};
+      arc_0.mid_point(), arc_0.pole(), arc_1.mid_point(), arc_1.pole())};
 
-  const Radians<T> distance_0{
-      vector::calculate_great_circle_atd(arc1.mid_point(), arc1.pole(), point)};
-  const Radians<T> distance_1{
-      vector::calculate_great_circle_atd(arc2.mid_point(), arc2.pole(), point)};
+  const Radians<T> distance_0{vector::calculate_great_circle_atd(
+      arc_0.mid_point(), arc_0.pole(), point)};
+  const Radians<T> distance_1{vector::calculate_great_circle_atd(
+      arc_1.mid_point(), arc_1.pole(), point)};
 
   const bool arcs_are_coincident{angle.sin().v() == T()};
   const bool arcs_intersect_or_overlap{
       arcs_are_coincident
           ? distance_0.abs().v() + distance_1.abs().v() <=
-                arc1.length().half().v() + arc2.length().half().v() +
+                arc_0.length().half().v() + arc_1.length().half().v() +
                     great_circle::MIN_VALUE<T>
           : (distance_0.abs().v() <=
-             arc1.length().half().v() + great_circle::MIN_VALUE<T>) &&
+             arc_0.length().half().v() + great_circle::MIN_VALUE<T>) &&
                 (distance_1.abs().v() <=
-                 arc2.length().half().v() + great_circle::MIN_VALUE<T>)};
+                 arc_1.length().half().v() + great_circle::MIN_VALUE<T>)};
   if (arcs_intersect_or_overlap) {
     return point;
   }
