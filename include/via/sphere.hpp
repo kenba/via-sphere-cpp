@@ -442,7 +442,8 @@ constexpr auto calculate_intersection_distances(const Arc<T> &arc_0,
     -> std::tuple<Radians<T>, Radians<T>> {
   const auto [distance_0, distance_1, angle]{
       vector::intersection::calculate_arc_reference_distances_and_angle(
-          arc_0.mid_point(), arc_0.pole(), arc_1.mid_point(), arc_1.pole())};
+          arc_0.mid_point(), arc_0.pole(), arc_1.mid_point(), arc_1.pole(),
+          vector::MIN_SQ_NORM<T>)};
 
   return {distance_0 + arc_1.length().half(),
           distance_1 + arc_1.length().half()};
@@ -460,7 +461,8 @@ constexpr auto calculate_intersection_point(const Arc<T> &arc_0,
     -> std::optional<vector::Vector3<T>> {
   const auto [point,
               angle]{vector::intersection::calculate_reference_point_and_angle(
-      arc_0.mid_point(), arc_0.pole(), arc_1.mid_point(), arc_1.pole())};
+      arc_0.mid_point(), arc_0.pole(), arc_1.mid_point(), arc_1.pole(),
+      vector::MIN_SQ_NORM<T>)};
 
   // calculate distances to the intersection or centroid from arc mid points
   const Radians<T> distance_0{vector::calculate_great_circle_atd(

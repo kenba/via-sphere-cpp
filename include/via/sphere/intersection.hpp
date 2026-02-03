@@ -87,7 +87,9 @@ constexpr auto closest_intersection_point(const Vector3<T> &point,
 /// centroid normalized to lie on the unit sphere if they don't.
 ///
 /// @param mid_point_0, mid_point_1 the mid points of the `Arc`s.
-/// @param pole_0, `pole_1` the poles of the `Arc` great circles.
+/// @param pole_0, pole_1 the poles of the `Arc` great circles.
+/// @param sq_sin_max_coincident_angle the square of the sine of the
+/// maximum angle between coincident great circles.
 ///
 /// @return the closest intersection point or normalized centroid and the
 /// sine of the angle between the arcs, zero if the arcs are coincident.
@@ -97,11 +99,12 @@ template <typename T>
 [[nodiscard("Pure Function")]]
 constexpr auto calculate_reference_point_and_angle(
     const Vector3<T> &mid_point_0, const Vector3<T> &pole_0,
-    const Vector3<T> &mid_point_1, const Vector3<T> &pole_1) noexcept
+    const Vector3<T> &mid_point_1, const Vector3<T> &pole_1,
+    const T sq_sin_max_coincident_angle) noexcept
     -> std::tuple<Vector3<T>, Angle<T>> {
   const Vector3<T> centroid{(mid_point_0 + mid_point_1)};
   const Vector3<T> point{pole_0.cross(pole_1)};
-  const auto p{normalise(point, MIN_SQ_NORM<T>)};
+  const auto p{normalise(point, sq_sin_max_coincident_angle)};
   if (p.has_value()) {
     // the great circles intersect
     const auto x{closest_intersection_point(p.value(), centroid)};
@@ -122,6 +125,8 @@ constexpr auto calculate_reference_point_and_angle(
 ///
 /// @param mid_point_0, mid_point_1 the mid points of the arcs.
 /// @param pole_0, pole_1 the poles of the arc great circles.
+/// @param sq_sin_max_coincident_angle the square of the sine of the
+/// maximum angle between coincident great circles.
 ///
 /// @return the signed great circle distances of the closest intersection
 /// point or centroid  from the arc mid points in `Radians`,
@@ -131,10 +136,11 @@ template <typename T>
 [[nodiscard("Pure Function")]]
 constexpr auto calculate_arc_reference_distances_and_angle(
     const Vector3<T> &mid_point_0, const Vector3<T> &pole_0,
-    const Vector3<T> &mid_point_1, const Vector3<T> &pole_1) noexcept
+    const Vector3<T> &mid_point_1, const Vector3<T> &pole_1,
+    const T sq_sin_max_coincident_angle) noexcept
     -> std::tuple<Radians<T>, Radians<T>, Angle<T>> {
   const auto [point, angle]{calculate_reference_point_and_angle(
-      mid_point_0, pole_0, mid_point_1, pole_1)};
+      mid_point_0, pole_0, mid_point_1, pole_1, sq_sin_max_coincident_angle)};
   const Radians<T> distance_0{
       calculate_great_circle_atd(mid_point_0, pole_0, point)};
   const Radians<T> distance_1{
