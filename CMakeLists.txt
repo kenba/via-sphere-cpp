@@ -1,4 +1,4 @@
-# Copyright (c) 2018-2024 Ken Barker
+# Copyright (c) 2018-2026 Ken Barker
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -56,6 +56,11 @@ if (INSTALL_PYTHON)
 
   pybind11_add_module(via_sphere src/via_sphere_python_bindings.cpp)
   target_compile_features(via_sphere PRIVATE cxx_std_23)
+  if (MSVC)
+    target_compile_options(via_sphere PRIVATE /arch:AVX2)
+  else()
+    target_compile_options(via_sphere PRIVATE -mavx2 -mfma)
+  endif()
   target_include_directories(via_sphere PRIVATE
     $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
   install(TARGETS via_sphere DESTINATION .)
@@ -90,9 +95,9 @@ if (CPP_UNIT_TESTS)
                             Boost::unit_test_framework)
 
     if (MSVC)
-        target_compile_options(${PROJECT_NAME}_test PRIVATE /W4)
+        target_compile_options(${PROJECT_NAME}_test PRIVATE /W4 /arch:AVX2)
     else()
-        target_compile_options(${PROJECT_NAME}_test PRIVATE -Wall -Wextra -Wpedantic)
+        target_compile_options(${PROJECT_NAME}_test PRIVATE -Wall -Wextra -Wpedantic -mavx2 -mfma)
 
         if (CODE_COVERAGE)
             target_compile_options(${PROJECT_NAME}_test PRIVATE --coverage)
